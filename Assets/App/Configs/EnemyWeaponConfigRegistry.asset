@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: EnemyWeaponConfigRegistry
   m_EditorClassIdentifier: 
   _configs:
-  - _attackType: 1
-    _bulletId: 0
-    _attackDamage: 10
-    _attackRange: 2
-    _attackCooldown: 2
+  - rid: 886955830288842776
+  references:
+    version: 2
+    RefIds:
+    - rid: 886955830288842776
+      type: {class: EnemyMeleeWeaponConfig, ns: App.Enemy.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponType: 0
+        _damage: 10
+        _attackRange: 2
+        _attackCooldown: 1.5

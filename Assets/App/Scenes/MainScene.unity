@@ -636,6 +636,7 @@ MonoBehaviour:
     type: 2}
   _bulletConfigRegistry: {fileID: 11400000, guid: 93039c68032e234469e01725e127ab78,
     type: 2}
+  _healthBarConfig: {fileID: 11400000, guid: f8a1276c3dc76c64baa84ca070d38d9f, type: 2}
 --- !u!1 &749618849
 GameObject:
   m_ObjectHideFlags: 0

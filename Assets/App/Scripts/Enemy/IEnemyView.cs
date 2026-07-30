@@ -1,4 +1,5 @@
 using System;
+using App.HealthBar;
 using UnityEngine;
 
 namespace App.Enemy
@@ -13,5 +14,6 @@ namespace App.Enemy
         void SetAgentEnabled(bool enabled);
         Action OnDestroyed { get; set; }
         Action<float> TakeExternalDamage { get; set; }
+        IHealthBarView CreateHealthBar();
     }
 }

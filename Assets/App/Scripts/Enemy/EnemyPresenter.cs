@@ -7,6 +7,7 @@ using App.Core.Services;
 using App.Enemy.States;
 using App.Enemy.Weapon;
 using App.Enemy.Wave;
+using App.HealthBar;
 using R3;
 using Unity.Entities;
 using Unity.Transforms;
@@ -27,6 +28,7 @@ namespace App.Enemy
 
         IEnemyState _currentState;
         Entity _entity;
+        HealthBarPresenter _healthBarPresenter;
 
         public IEnemyView View => _view;
         public IPlayerTargetProvider PlayerTarget => _playerTarget;
@@ -55,6 +57,7 @@ namespace App.Enemy
 
             _model.MoveSpeed.Value = config.MoveSpeed;
             _model.Health.Value = config.Health;
+            _model.MaxHealth.Value = config.Health;
             _model.AttackDamage.Value = AttackDamage;
             _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
@@ -71,6 +74,12 @@ namespace App.Enemy
 
             _view.OnDestroyed += Dispose;
             _view.TakeExternalDamage = TakeDamage;
+
+            var healthBarView = _view.CreateHealthBar();
+            if (healthBarView != null)
+            {
+                _healthBarPresenter = new HealthBarPresenter(healthBarView, _model.Health, config.Health);
+            }
 
             Observable.EveryUpdate(UnityFrameProvider.PostLateUpdate)
                 .Subscribe(_ => OnLateUpdate())
@@ -203,6 +212,7 @@ namespace App.Enemy
         {
             _view.OnDestroyed -= Dispose;
             _view.TakeExternalDamage = null;
+            _healthBarPresenter?.Dispose();
             _disposables.Dispose();
         }
     }

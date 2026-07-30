@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using App.Combat.Attack;
 using App.Core;
 using App.Core.EventBus;
+using App.HealthBar;
 using App.Player.Combat;
 using App.Player.ECS;
 using App.Player.States;
@@ -42,6 +43,7 @@ namespace App.Player
         float _lastAttackTime;
 
         IPlayerState _currentState;
+        HealthBarPresenter _healthBarPresenter;
 
         public const float Gravity = -9.81f;
         public float VerticalVelocity { get; set; }
@@ -79,6 +81,13 @@ namespace App.Player
             };
 
             TransitionTo(PlayerStateType.Idle);
+
+            var healthBarView = _view.CreateHealthBar();
+            if (healthBarView != null)
+            {
+                _healthBarPresenter = new HealthBarPresenter(
+                    healthBarView, _model.Health, _model.MaxHealth.Value);
+            }
 
             Observable.EveryUpdate()
                 .Subscribe(_ => OnUpdate())
@@ -252,6 +261,7 @@ namespace App.Player
 
         public void Dispose()
         {
+            _healthBarPresenter?.Dispose();
             _disposables.Dispose();
         }
     }

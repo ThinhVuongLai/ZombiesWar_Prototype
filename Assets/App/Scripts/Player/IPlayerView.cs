@@ -1,4 +1,5 @@
 using System;
+using App.HealthBar;
 using UnityEngine;
 
 namespace App.Player
@@ -9,5 +10,6 @@ namespace App.Player
         void FaceDirection(Vector3 direction);
         bool IsGrounded { get; }
         Transform Transform { get; }
+        IHealthBarView CreateHealthBar();
     }
 }

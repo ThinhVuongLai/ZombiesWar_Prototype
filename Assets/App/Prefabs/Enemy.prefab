@@ -148,6 +148,7 @@ MonoBehaviour:
   _moveSpeed: 3.5
   _health: 100
   _detectionRange: 10000
+  _healthBarConfig: {fileID: 11400000, guid: 58fa8eddd71f2d44895326b2f97013d9, type: 2}
 --- !u!1 &6850062204660632467
 GameObject:
   m_ObjectHideFlags: 0

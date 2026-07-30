@@ -1,5 +1,6 @@
 using System;
 using App.Core.Services;
+using App.HealthBar;
 using UnityEngine;
 using ZombiesWar.Bullet;
 using ZombiesWar.Weapon;
@@ -11,6 +12,7 @@ namespace App.Player
     {
         [SerializeField] WeaponConfigRegistry _weaponConfigRegistry;
         [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
+        [SerializeField] HealthBarConfig _healthBarConfig;
 
         CharacterController _characterController;
         PlayerPresenter _presenter;
@@ -44,6 +46,17 @@ namespace App.Player
             if (direction == Vector3.zero) return;
             var targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Euler(0f, targetRotation.eulerAngles.y, 0f);
+        }
+
+        public IHealthBarView CreateHealthBar()
+        {
+            if (_healthBarConfig == null) return null;
+
+            var go = new GameObject("HealthBar");
+            go.transform.SetParent(transform, false);
+            var view = go.AddComponent<HealthBarView>();
+            view.Initialize(_healthBarConfig, transform);
+            return view;
         }
     }
 }

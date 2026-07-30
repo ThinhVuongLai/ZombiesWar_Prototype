@@ -1,4 +1,5 @@
 using System;
+using App.HealthBar;
 using UnityEngine;
 using UnityEngine.AI;
 using ZombiesWar.ThrowingWeapon;
@@ -31,6 +32,9 @@ namespace App.Enemy
         [SerializeField] float _moveSpeed = 3.5f;
         [SerializeField] float _health = 100f;
         [SerializeField] float _detectionRange = 12f;
+
+        [Header("Health Bar")]
+        [SerializeField] HealthBarConfig _healthBarConfig;
 
         NavMeshAgent _agent;
         EnemyViewConfig _config;
@@ -76,6 +80,17 @@ namespace App.Enemy
         void IDamageable.TakeDamage(float damage)
         {
             TakeExternalDamage?.Invoke(damage);
+        }
+
+        public IHealthBarView CreateHealthBar()
+        {
+            if (_healthBarConfig == null) return null;
+
+            var go = new GameObject("HealthBar");
+            go.transform.SetParent(transform, false);
+            var view = go.AddComponent<HealthBarView>();
+            view.Initialize(_healthBarConfig, transform);
+            return view;
         }
     }
 }
