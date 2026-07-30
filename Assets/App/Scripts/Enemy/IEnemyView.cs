@@ -12,5 +12,6 @@ namespace App.Enemy
         float RemainingDistance { get; }
         void SetAgentEnabled(bool enabled);
         Action OnDestroyed { get; set; }
+        Action<float> TakeExternalDamage { get; set; }
     }
 }

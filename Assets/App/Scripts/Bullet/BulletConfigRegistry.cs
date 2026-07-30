@@ -10,14 +10,12 @@ namespace ZombiesWar.Bullet
         [SerializeField] int _bulletId;
         [SerializeField] BulletMovementType _movementType;
         [SerializeField] float _speed = 10f;
-        [SerializeField] float _damage = 10f;
         [SerializeField] float _range = 15f;
         [SerializeField] GameObject _visualPrefab;
 
         public int BulletId => _bulletId;
         public BulletMovementType MovementType => _movementType;
         public float Speed => _speed;
-        public float Damage => _damage;
         public float Range => _range;
         public GameObject VisualPrefab => _visualPrefab;
     }

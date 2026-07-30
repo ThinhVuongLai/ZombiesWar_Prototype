@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
+using App.Player.ECS;
 
 namespace ZombiesWar.Bullet.ECS
 {
@@ -12,6 +13,7 @@ namespace ZombiesWar.Bullet.ECS
     {
         EntityQuery _bulletQuery;
         EntityQuery _enemyQuery;
+        EntityQuery _playerQuery;
 
         const float HitRadius = 0.5f;
 
@@ -29,6 +31,11 @@ namespace ZombiesWar.Bullet.ECS
                 ComponentType.ReadOnly<LocalTransform>(),
                 ComponentType.ReadWrite<EnemyHealth>()
             );
+
+            _playerQuery = state.GetEntityQuery(
+                ComponentType.ReadOnly<LocalTransform>(),
+                ComponentType.ReadWrite<PlayerHealth>()
+            );
         }
 
         public void OnUpdate(ref SystemState state)
@@ -41,6 +48,10 @@ namespace ZombiesWar.Bullet.ECS
             var enemyEntities = _enemyQuery.ToEntityArray(Allocator.Temp);
             var enemyTransforms = _enemyQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
             var enemyHealths = _enemyQuery.ToComponentDataArray<EnemyHealth>(Allocator.Temp);
+
+            var playerEntities = _playerQuery.ToEntityArray(Allocator.Temp);
+            var playerTransforms = _playerQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var playerHealths = _playerQuery.ToComponentDataArray<PlayerHealth>(Allocator.Temp);
 
             const float hitRadiusSq = HitRadius * HitRadius;
 
@@ -60,6 +71,8 @@ namespace ZombiesWar.Bullet.ECS
 
                 if (segLengthSq < 0.0001f)
                     continue;
+
+                bool hitSomething = false;
 
                 for (int j = 0; j < enemyEntities.Length; j++)
                 {
@@ -88,7 +101,43 @@ namespace ZombiesWar.Bullet.ECS
                             PreviousPosition = prevPos,
                             HasHit = true,
                         };
+                        hitSomething = true;
                         break;
+                    }
+                }
+
+                if (!hitSomething)
+                {
+                    for (int j = 0; j < playerEntities.Length; j++)
+                    {
+                        if (playerHealths[j].Value <= 0f)
+                            continue;
+
+                        float3 playerPos = playerTransforms[j].Position;
+
+                        float t = math.dot(playerPos - prevPos, movementDir) / segLengthSq;
+                        t = math.clamp(t, 0f, 1f);
+
+                        float3 closestPoint = prevPos + t * movementDir;
+                        float sqrDist = math.distancesq(playerPos, closestPoint);
+
+                        if (sqrDist <= hitRadiusSq)
+                        {
+                            playerHealths[j] = new PlayerHealth
+                            {
+                                Value = math.max(playerHealths[j].Value - bulletDatas[i].Damage, 0f),
+                                MaxValue = playerHealths[j].MaxValue,
+                            };
+
+                            bulletLifeDatas[i] = new BulletLifeData
+                            {
+                                RemainingLife = bulletLifeDatas[i].RemainingLife,
+                                StartPosition = bulletLifeDatas[i].StartPosition,
+                                PreviousPosition = prevPos,
+                                HasHit = true,
+                            };
+                            break;
+                        }
                     }
                 }
             }
@@ -103,6 +152,11 @@ namespace ZombiesWar.Bullet.ECS
                 state.EntityManager.SetComponentData(enemyEntities[j], enemyHealths[j]);
             }
 
+            for (int j = 0; j < playerEntities.Length; j++)
+            {
+                state.EntityManager.SetComponentData(playerEntities[j], playerHealths[j]);
+            }
+
             bulletEntities.Dispose();
             bulletDatas.Dispose();
             bulletLifeDatas.Dispose();
@@ -110,6 +164,9 @@ namespace ZombiesWar.Bullet.ECS
             enemyEntities.Dispose();
             enemyTransforms.Dispose();
             enemyHealths.Dispose();
+            playerEntities.Dispose();
+            playerTransforms.Dispose();
+            playerHealths.Dispose();
         }
     }
 }

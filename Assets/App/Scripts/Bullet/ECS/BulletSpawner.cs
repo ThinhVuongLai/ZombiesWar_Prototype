@@ -7,7 +7,7 @@ namespace ZombiesWar.Bullet.ECS
 {
     public static class BulletSpawner
     {
-        public static Entity SpawnBullet(BulletConfig config, float3 startPosition, Entity targetEntity)
+        public static Entity SpawnBullet(BulletConfig config, float damage, float3 startPosition, Entity targetEntity)
         {
             var world = World.DefaultGameObjectInjectionWorld;
             var em = world.EntityManager;
@@ -23,7 +23,7 @@ namespace ZombiesWar.Bullet.ECS
             em.SetComponentData(entity, new BulletData
             {
                 Speed = config.Speed,
-                Damage = config.Damage,
+                Damage = damage,
                 Lifetime = lifetime,
                 MovementType = config.MovementType,
                 TargetEntity = targetEntity,

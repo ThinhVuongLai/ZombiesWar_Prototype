@@ -1,5 +1,7 @@
-using App.Core.EventBus;
-using App.Core.Services;
+using App.Core;
+using App.Player.ECS;
+using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace App.Enemy.Attack
@@ -7,13 +9,25 @@ namespace App.Enemy.Attack
     public class EnemyMeleeAttack : IEnemyAttackStrategy
     {
         public EnemyAttackType AttackType => EnemyAttackType.Melee;
-        public float Range => 2f;
 
         public void Execute(IEnemyView view, IPlayerTargetProvider target, float damage)
         {
             FacePlayer(view, target);
 
-            var eventBus = ServiceLocator.Resolve<IEventBus>();
+            var playerEntity = PlayerTargetECSUpdater.PlayerEntity;
+            if (playerEntity != Entity.Null)
+            {
+                var em = World.DefaultGameObjectInjectionWorld.EntityManager;
+                if (em.Exists(playerEntity) && em.HasComponent<PlayerHealth>(playerEntity))
+                {
+                    var health = em.GetComponentData<PlayerHealth>(playerEntity);
+                    health.Value = math.max(health.Value - damage, 0f);
+                    em.SetComponentData(playerEntity, health);
+                    return;
+                }
+            }
+
+            var eventBus = Core.Services.ServiceLocator.Resolve<Core.EventBus.IEventBus>();
             eventBus.Publish(new EnemyDealtDamageMessage(damage, EnemyAttackType.Melee));
         }
 

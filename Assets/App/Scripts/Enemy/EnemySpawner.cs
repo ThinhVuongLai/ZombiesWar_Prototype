@@ -1,14 +1,26 @@
 using App.Core.Services;
 using App.Enemy.Attack;
+using App.Enemy.Weapon;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
+using ZombiesWar.Bullet;
 
 namespace App.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField] GameObject _enemyPrefab;
+        [SerializeField] EnemyWeaponConfigRegistry _enemyWeaponConfigRegistry;
+        [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
+
+        AttackStrategyRegistry _attackStrategyRegistry;
+
+        void Awake()
+        {
+            _attackStrategyRegistry = new AttackStrategyRegistry(
+                _enemyWeaponConfigRegistry, _bulletConfigRegistry);
+        }
 
         public EnemyView SpawnEnemy(Vector3 position, GameObject overridePrefab = null)
         {
@@ -24,10 +36,10 @@ namespace App.Enemy
                 return null;
             }
 
-            var registry = ServiceLocator.Resolve<AttackStrategyRegistry>();
             var playerTarget = ServiceLocator.Resolve<IPlayerTargetProvider>();
 
-            var presenter = new EnemyPresenter(enemyView, enemyView.Config, registry, playerTarget);
+            var presenter = new EnemyPresenter(enemyView, enemyView.Config,
+                _attackStrategyRegistry, _enemyWeaponConfigRegistry, playerTarget);
 
             var em = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entity = em.CreateEntity(

@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
+using App.Player.ECS;
 
 namespace ZombiesWar.Bullet.ECS
 {
@@ -40,19 +41,7 @@ namespace ZombiesWar.Bullet.ECS
                 float3 startPos = bulletLifeDatas[i].StartPosition;
                 Entity targetEntity = bulletDatas[i].TargetEntity;
 
-                if (targetEntity == Entity.Null)
-                {
-                    bulletLifeDatas[i] = new BulletLifeData
-                    {
-                        RemainingLife = bulletLifeDatas[i].RemainingLife,
-                        StartPosition = startPos,
-                        PreviousPosition = bulletLifeDatas[i].PreviousPosition,
-                        HasHit = true,
-                    };
-                    continue;
-                }
-
-                if (!state.EntityManager.Exists(targetEntity))
+                if (targetEntity == Entity.Null || !state.EntityManager.Exists(targetEntity))
                 {
                     bulletLifeDatas[i] = new BulletLifeData
                     {
@@ -64,54 +53,17 @@ namespace ZombiesWar.Bullet.ECS
                     continue;
                 }
 
-                if (!state.EntityManager.HasComponent<LocalTransform>(targetEntity) ||
-                    !state.EntityManager.HasComponent<EnemyHealth>(targetEntity))
+                var bulletData = bulletDatas[i];
+                var lifeData = bulletLifeDatas[i];
+
+                if (TryDealDamageToEnemy(state.EntityManager, targetEntity, startPos, bulletData, ref lifeData))
                 {
-                    bulletLifeDatas[i] = new BulletLifeData
-                    {
-                        RemainingLife = 0f,
-                        StartPosition = startPos,
-                        PreviousPosition = bulletLifeDatas[i].PreviousPosition,
-                        HasHit = true,
-                    };
+                    bulletLifeDatas[i] = lifeData;
                     continue;
                 }
 
-                var targetTransform = state.EntityManager.GetComponentData<LocalTransform>(targetEntity);
-                var targetHealth = state.EntityManager.GetComponentData<EnemyHealth>(targetEntity);
-
-                if (targetHealth.Value <= 0f)
-                {
-                    bulletLifeDatas[i] = new BulletLifeData
-                    {
-                        RemainingLife = 0f,
-                        StartPosition = startPos,
-                        PreviousPosition = bulletLifeDatas[i].PreviousPosition,
-                        HasHit = true,
-                    };
-                    continue;
-                }
-
-                float rangeSq = bulletDatas[i].Lifetime * bulletDatas[i].Speed;
-                rangeSq *= rangeSq;
-
-                float sqrDist = math.distancesq(targetTransform.Position, startPos);
-
-                if (sqrDist <= rangeSq)
-                {
-                    state.EntityManager.SetComponentData(targetEntity, new EnemyHealth
-                    {
-                        Value = math.max(targetHealth.Value - bulletDatas[i].Damage, 0f)
-                    });
-                }
-
-                bulletLifeDatas[i] = new BulletLifeData
-                {
-                    RemainingLife = 0f,
-                    StartPosition = startPos,
-                    PreviousPosition = bulletLifeDatas[i].PreviousPosition,
-                    HasHit = true,
-                };
+                TryDealDamageToPlayer(state.EntityManager, targetEntity, startPos, bulletData, ref lifeData);
+                bulletLifeDatas[i] = lifeData;
             }
 
             for (int i = 0; i < bulletEntities.Length; i++)
@@ -123,6 +75,100 @@ namespace ZombiesWar.Bullet.ECS
             bulletDatas.Dispose();
             bulletLifeDatas.Dispose();
             bulletTransforms.Dispose();
+        }
+
+        static bool TryDealDamageToEnemy(EntityManager em, Entity targetEntity, float3 startPos,
+            BulletData data, ref BulletLifeData lifeData)
+        {
+            if (!em.HasComponent<EnemyHealth>(targetEntity))
+                return false;
+
+            var targetHealth = em.GetComponentData<EnemyHealth>(targetEntity);
+            if (targetHealth.Value <= 0f)
+            {
+                lifeData = new BulletLifeData
+                {
+                    RemainingLife = 0f,
+                    StartPosition = startPos,
+                    PreviousPosition = lifeData.PreviousPosition,
+                    HasHit = true,
+                };
+                return true;
+            }
+
+            if (!em.HasComponent<LocalTransform>(targetEntity))
+                return false;
+
+            var targetTransform = em.GetComponentData<LocalTransform>(targetEntity);
+
+            float rangeSq = data.Lifetime * data.Speed;
+            rangeSq *= rangeSq;
+
+            float sqrDist = math.distancesq(targetTransform.Position, startPos);
+
+            if (sqrDist <= rangeSq)
+            {
+                em.SetComponentData(targetEntity, new EnemyHealth
+                {
+                    Value = math.max(targetHealth.Value - data.Damage, 0f)
+                });
+            }
+
+            lifeData = new BulletLifeData
+            {
+                RemainingLife = 0f,
+                StartPosition = startPos,
+                PreviousPosition = lifeData.PreviousPosition,
+                HasHit = true,
+            };
+            return true;
+        }
+
+        static void TryDealDamageToPlayer(EntityManager em, Entity targetEntity, float3 startPos,
+            BulletData data, ref BulletLifeData lifeData)
+        {
+            if (!em.HasComponent<PlayerHealth>(targetEntity))
+                return;
+
+            var playerHealth = em.GetComponentData<PlayerHealth>(targetEntity);
+            if (playerHealth.Value <= 0f)
+            {
+                lifeData = new BulletLifeData
+                {
+                    RemainingLife = 0f,
+                    StartPosition = startPos,
+                    PreviousPosition = lifeData.PreviousPosition,
+                    HasHit = true,
+                };
+                return;
+            }
+
+            if (!em.HasComponent<LocalTransform>(targetEntity))
+                return;
+
+            var targetTransform = em.GetComponentData<LocalTransform>(targetEntity);
+
+            float rangeSq = data.Lifetime * data.Speed;
+            rangeSq *= rangeSq;
+
+            float sqrDist = math.distancesq(targetTransform.Position, startPos);
+
+            if (sqrDist <= rangeSq)
+            {
+                em.SetComponentData(targetEntity, new PlayerHealth
+                {
+                    Value = math.max(playerHealth.Value - data.Damage, 0f),
+                    MaxValue = playerHealth.MaxValue,
+                });
+            }
+
+            lifeData = new BulletLifeData
+            {
+                RemainingLife = 0f,
+                StartPosition = startPos,
+                PreviousPosition = lifeData.PreviousPosition,
+                HasHit = true,
+            };
         }
     }
 }

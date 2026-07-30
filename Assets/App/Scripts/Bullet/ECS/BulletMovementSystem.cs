@@ -3,6 +3,8 @@ using Unity.Burst;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
+using App.Player.ECS;
 
 namespace ZombiesWar.Bullet.ECS
 {
@@ -11,8 +13,9 @@ namespace ZombiesWar.Bullet.ECS
     {
         public float DeltaTime;
 
-        [ReadOnly] public ComponentLookup<LocalTransform> Transforms;
-        [ReadOnly] public ComponentLookup<EnemyHealth> EnemyHealths;
+        [ReadOnly] [NativeDisableContainerSafetyRestriction] public ComponentLookup<LocalTransform> Transforms;
+        [ReadOnly] [NativeDisableContainerSafetyRestriction] public ComponentLookup<EnemyHealth> EnemyHealths;
+        [ReadOnly] [NativeDisableContainerSafetyRestriction] public ComponentLookup<PlayerHealth> PlayerHealths;
 
         void Execute(ref BulletData data, ref BulletLifeData life, ref LocalTransform transform)
         {
@@ -31,7 +34,13 @@ namespace ZombiesWar.Bullet.ECS
 
             life.PreviousPosition = transform.Position;
 
-            if (Transforms.HasComponent(data.TargetEntity) && EnemyHealths.HasComponent(data.TargetEntity))
+            if (!Transforms.HasComponent(data.TargetEntity))
+            {
+                life.HasHit = true;
+                return;
+            }
+
+            if (EnemyHealths.HasComponent(data.TargetEntity))
             {
                 var targetHealth = EnemyHealths[data.TargetEntity];
                 if (targetHealth.Value <= 0f)
@@ -39,15 +48,20 @@ namespace ZombiesWar.Bullet.ECS
                     life.HasHit = true;
                     return;
                 }
-
-                var targetPos = Transforms[data.TargetEntity].Position;
-                var dir = math.normalizesafe(targetPos - transform.Position);
-                transform.Position += dir * data.Speed * DeltaTime;
             }
-            else
+            else if (PlayerHealths.HasComponent(data.TargetEntity))
             {
-                life.HasHit = true;
+                var playerHealth = PlayerHealths[data.TargetEntity];
+                if (playerHealth.Value <= 0f)
+                {
+                    life.HasHit = true;
+                    return;
+                }
             }
+
+            var targetPos = Transforms[data.TargetEntity].Position;
+            var dir = math.normalizesafe(targetPos - transform.Position);
+            transform.Position += dir * data.Speed * DeltaTime;
         }
     }
 
@@ -65,12 +79,14 @@ namespace ZombiesWar.Bullet.ECS
         {
             var transformsLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
             var healthsLookup = SystemAPI.GetComponentLookup<EnemyHealth>(true);
+            var playerHealthsLookup = SystemAPI.GetComponentLookup<PlayerHealth>(true);
 
             var job = new BulletMovementJob
             {
                 DeltaTime = SystemAPI.Time.DeltaTime,
                 Transforms = transformsLookup,
                 EnemyHealths = healthsLookup,
+                PlayerHealths = playerHealthsLookup,
             };
 
             state.Dependency = job.ScheduleParallel(state.Dependency);

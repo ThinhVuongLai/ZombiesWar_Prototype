@@ -1,4 +1,3 @@
-using App.Enemy.Attack;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,7 +7,7 @@ namespace App.Enemy
     {
         public void Install(IContainerBuilder builder)
         {
-            builder.Register<AttackStrategyRegistry>(Lifetime.Singleton);
+            // AttackStrategyRegistry is created in EnemySpawner with ScriptableObject dependencies
         }
     }
 }

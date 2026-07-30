@@ -1,4 +1,6 @@
+using App.Player.ECS;
 using Unity.Entities;
+using Unity.Transforms;
 using ZombiesWar.Bullet.ECS;
 
 public static class EnemyECSWorldBootstrap
@@ -19,6 +21,14 @@ public static class EnemyECSWorldBootstrap
             Position = Unity.Mathematics.float3.zero,
             IsAlive = true,
         });
+
+        var playerHealthEntity = em.CreateEntity(typeof(PlayerHealth), typeof(LocalTransform));
+        em.SetComponentData(playerHealthEntity, new PlayerHealth
+        {
+            Value = 100f,
+            MaxValue = 100f,
+        });
+        em.SetComponentData(playerHealthEntity, LocalTransform.FromPosition(Unity.Mathematics.float3.zero));
 
         var weaponTargetEntity = em.CreateEntity(typeof(PlayerWeaponTargetData));
         em.SetComponentData(weaponTargetEntity, new PlayerWeaponTargetData

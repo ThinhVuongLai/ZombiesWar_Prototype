@@ -4,6 +4,7 @@ using App.Core.EventBus;
 using App.Core.Services;
 using App.Enemy.Attack;
 using App.Enemy.States;
+using App.Enemy.Weapon;
 using App.Enemy.Wave;
 using R3;
 using Unity.Entities;
@@ -28,26 +29,31 @@ namespace App.Enemy
         public IPlayerTargetProvider PlayerTarget => _playerTarget;
         public IEnemyAttackStrategy AttackStrategy { get; }
         public float AttackDamage { get; }
+        public float AttackRange { get; }
 
         // Cached from ECS (read after SimulationSystemGroup completes, in LateUpdate)
         public EnemyDetectionState CachedDetectionState { get; private set; }
         public bool CachedNeedsCombatResult { get; private set; }
 
         public EnemyPresenter(IEnemyView view, in EnemyViewConfig config,
-            AttackStrategyRegistry registry, IPlayerTargetProvider playerTarget)
+            AttackStrategyRegistry registry, EnemyWeaponConfigRegistry enemyWeaponRegistry,
+            IPlayerTargetProvider playerTarget)
         {
             _view = view;
             _playerTarget = playerTarget;
             _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+            var weaponConfig = enemyWeaponRegistry?.GetConfig(config.AttackType);
+
             _model = new EnemyModel();
             AttackStrategy = registry.Get(config.AttackType);
-            AttackDamage = config.AttackDamage;
+            AttackDamage = weaponConfig?.AttackDamage ?? 10f;
+            AttackRange = weaponConfig?.AttackRange ?? 2f;
 
             _model.MoveSpeed.Value = config.MoveSpeed;
             _model.Health.Value = config.Health;
-            _model.AttackDamage.Value = config.AttackDamage;
-            _model.AttackCooldown.Value = config.AttackCooldown;
+            _model.AttackDamage.Value = AttackDamage;
+            _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
             _model.AttackStrategy = AttackStrategy;
 
@@ -62,6 +68,7 @@ namespace App.Enemy
             TransitionTo(EnemyStateType.Idle);
 
             _view.OnDestroyed += Dispose;
+            _view.TakeExternalDamage = TakeDamage;
 
             Observable.EveryUpdate(UnityFrameProvider.PostLateUpdate)
                 .Subscribe(_ => OnLateUpdate())
@@ -80,7 +87,7 @@ namespace App.Enemy
                 {
                     MoveSpeed = _model.MoveSpeed.Value,
                     AttackDamage = _model.AttackDamage.Value,
-                    AttackRange = AttackStrategy.Range,
+                    AttackRange = AttackRange,
                     DetectionRange = _model.DetectionRange.Value,
                     AttackCooldown = _model.AttackCooldown.Value,
                 });
@@ -176,6 +183,7 @@ namespace App.Enemy
         public void Dispose()
         {
             _view.OnDestroyed -= Dispose;
+            _view.TakeExternalDamage = null;
             _disposables.Dispose();
         }
     }

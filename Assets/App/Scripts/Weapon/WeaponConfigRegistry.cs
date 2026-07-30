@@ -8,12 +8,18 @@ namespace ZombiesWar.Weapon
     public class WeaponConfig
     {
         [SerializeField] int _weaponId;
+        [SerializeField] WeaponType _weaponType;
         [SerializeField] int _bulletId;
         [SerializeField] float _attackCooldown = 0.5f;
+        [SerializeField] float _damage = 10f;
+        [SerializeField] float _attackRange = 2f;
 
         public int WeaponId => _weaponId;
+        public WeaponType WeaponType => _weaponType;
         public int BulletId => _bulletId;
         public float AttackCooldown => _attackCooldown;
+        public float Damage => _damage;
+        public float AttackRange => _attackRange;
     }
 
     [CreateAssetMenu(fileName = "WeaponConfigRegistry", menuName = "ZombiesWar/Weapon Config Registry")]
