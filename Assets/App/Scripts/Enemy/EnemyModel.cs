@@ -1,5 +1,4 @@
 using R3;
-using App.Enemy.Attack;
 
 namespace App.Enemy
 {
@@ -19,7 +18,5 @@ namespace App.Enemy
         public ReactiveProperty<float> AttackCooldown { get; } = new(1.5f);
         public ReactiveProperty<float> DetectionRange { get; } = new(12f);
         public ReactiveProperty<EnemyStateType> CurrentState { get; } = new(EnemyStateType.Idle);
-
-        public IEnemyAttackStrategy AttackStrategy { get; set; }
     }
 }

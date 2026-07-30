@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using App.Combat.Attack;
 using App.Core;
 using App.Core.EventBus;
 using App.Player.Combat;
@@ -11,8 +12,6 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using ZombiesWar.Bullet;
-using ZombiesWar.Bullet.ECS;
-using ZombiesWar.ThrowingWeapon;
 using ZombiesWar.Weapon;
 
 namespace App.Player
@@ -29,7 +28,7 @@ namespace App.Player
         readonly EntityManager _entityManager;
         readonly WeaponConfigRegistry _weaponConfigRegistry;
         readonly BulletConfigRegistry _bulletConfigRegistry;
-        readonly ThrowActionRegistry _throwActionRegistry;
+        readonly AttackStrategyRegistry _attackRegistry;
 
         Entity _weaponTargetEntity;
         bool _weaponEntityResolved;
@@ -40,8 +39,6 @@ namespace App.Player
         BulletConfig _currentBulletConfig;
         WeaponBase _currentWeaponConfig;
         WeaponType _currentWeaponType;
-        float _currentMeleeDamage;
-        float _currentMeleeRange;
         float _lastAttackTime;
 
         IPlayerState _currentState;
@@ -66,7 +63,8 @@ namespace App.Player
             _eventBus = eventBus;
             _weaponConfigRegistry = weaponConfigRegistry;
             _bulletConfigRegistry = bulletConfigRegistry;
-            _throwActionRegistry = new ThrowActionRegistry();
+            _attackRegistry = new AttackStrategyRegistry();
+            _attackRegistry.Register(WeaponType.Melee, new MeleeAttackStrategy());
 
             _model = new PlayerModel();
             _combatModel = new PlayerCombatModel();
@@ -203,11 +201,11 @@ namespace App.Player
             else
             {
                 _currentBulletConfig = null;
-                _currentMeleeDamage = weaponConfig.Damage;
-                _currentMeleeRange = weaponConfig.AttackRange;
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
                 UpdateWeaponECSRadius(weaponConfig.AttackRange);
             }
+
+            AttackStrategyRegistry.RegisterFromConfig(_attackRegistry, weaponConfig, _bulletConfigRegistry);
         }
 
         void UpdateWeaponECSRadius(float radius)
@@ -233,100 +231,23 @@ namespace App.Player
             var data = _entityManager.GetComponentData<PlayerWeaponTargetData>(_weaponTargetEntity);
             if (!data.HasTarget) return;
 
-            if (_currentWeaponType == WeaponType.Melee)
-            {
-                TryMeleeAttack(data);
-            }
-            else if (_currentWeaponType == WeaponType.Throwing && _currentWeaponConfig is ThrowWeaponConfig)
-            {
-                TryThrowingAttack(data);
-            }
-            else if (_currentBulletConfig != null)
-            {
-                TryRangedAttack(data);
-            }
-        }
-
-        void TryMeleeAttack(PlayerWeaponTargetData data)
-        {
             var targetEntity = data.CurrentTargetEntity;
-            if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity))
-                return;
+            if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity)) return;
+            if (!_entityManager.HasComponent<LocalTransform>(targetEntity)) return;
 
-            if (!_entityManager.HasComponent<EnemyHealth>(targetEntity))
-                return;
+            var targetPos = (Vector3)_entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
 
-            var targetTransform = _entityManager.GetComponentData<LocalTransform>(targetEntity);
-            var sqrDist = math.distancesq(targetTransform.Position, (float3)_view.Transform.position);
+            var strategy = _attackRegistry.Get(_currentWeaponType);
+            if (strategy == null) return;
 
-            if (sqrDist > _currentMeleeRange * _currentMeleeRange)
-                return;
+            strategy.Execute(
+                _view.Transform.position, _view.Transform,
+                targetEntity, targetPos,
+                _currentWeaponConfig.Damage,
+                new EnemyHealthAccessor(),
+                faceTarget: false);
 
             _lastAttackTime = Time.time;
-
-            var health = _entityManager.GetComponentData<EnemyHealth>(targetEntity);
-            health.Value = math.max(health.Value - _currentMeleeDamage, 0f);
-            _entityManager.SetComponentData(targetEntity, health);
-        }
-
-        void TryRangedAttack(PlayerWeaponTargetData data)
-        {
-            _lastAttackTime = Time.time;
-
-            var firePos = (float3)_view.Transform.position + new float3(0, 1.5f, 0);
-            BulletSpawner.SpawnBullet(_currentBulletConfig, _currentWeaponConfig.Damage,
-                firePos, data.CurrentTargetEntity);
-        }
-
-        void TryThrowingAttack(PlayerWeaponTargetData data)
-        {
-            _lastAttackTime = Time.time;
-
-            var config = _currentWeaponConfig as ThrowWeaponConfig;
-            if (config == null) return;
-            var targetEntity = data.CurrentTargetEntity;
-            if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity))
-                return;
-            if (!_entityManager.HasComponent<LocalTransform>(targetEntity))
-                return;
-
-            var targetPos = _entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
-            var throwPos = (Vector3)(float3)_view.Transform.position + new Vector3(0, 1.5f, 0);
-
-            var horizontalDist = Vector3.Distance(
-                new Vector3(throwPos.x, 0, throwPos.z),
-                new Vector3(targetPos.x, 0, targetPos.z));
-            var heightDiff = targetPos.y - throwPos.y;
-
-            var angleRad = config.ThrowAngle * Mathf.Deg2Rad;
-            var angleCos = Mathf.Cos(angleRad);
-            var angleSin = Mathf.Sin(angleRad);
-
-            var denominator = 2f * (horizontalDist * angleSin * angleCos -
-                heightDiff * angleCos * angleCos);
-            if (Mathf.Abs(denominator) < 0.001f) return;
-
-            var gMagnitude = Mathf.Abs(Physics.gravity.y) * config.GravityScale;
-            var speedSq = (gMagnitude * horizontalDist * horizontalDist) / denominator;
-            if (speedSq <= 0f) return;
-            var speed = Mathf.Sqrt(speedSq);
-
-            speed = Mathf.Clamp(speed, config.MinThrowForce, config.MaxThrowForce);
-
-            var dirToTarget = new Vector3(targetPos.x - throwPos.x, 0, targetPos.z - throwPos.z).normalized;
-            var velocity = dirToTarget * (speed * angleCos);
-            velocity.y = speed * angleSin;
-
-            var thrownGo = UnityEngine.Object.Instantiate(config.ObjectPrefab, throwPos, Quaternion.identity);
-            var thrownObj = thrownGo.GetComponent<ThrownObject>();
-            if (thrownObj == null)
-            {
-                thrownObj = thrownGo.AddComponent<ThrownObject>();
-            }
-
-            var throwAction = _throwActionRegistry.GetAction(config.ActionType);
-            thrownObj.Initialize(config.ObjectLifespan, config.ActionRadius, config.Damage,
-                config.GravityScale, throwAction, velocity);
         }
 
         public void Dispose()

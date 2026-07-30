@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using App.Combat.Attack;
 using UnityEngine;
 using ZombiesWar.ThrowingWeapon;
 
@@ -33,7 +34,7 @@ namespace App.Enemy.Weapon
     }
 
     [Serializable]
-    public class EnemyThrowWeaponConfig : EnemyWeaponConfig
+    public class EnemyThrowWeaponConfig : EnemyWeaponConfig, IThrowConfig
     {
         [SerializeField] float _throwAngle = 45f;
         [SerializeField] float _minThrowForce = 5f;

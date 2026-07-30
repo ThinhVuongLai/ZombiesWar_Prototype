@@ -29,7 +29,7 @@ namespace App.Enemy.States
 
             if (presenter.CachedNeedsCombatResult)
             {
-                presenter.AttackStrategy.Execute(presenter.View, presenter.PlayerTarget, presenter.AttackDamage);
+                presenter.ExecuteAttack();
                 presenter.ResetNeedsCombatResult();
             }
         }

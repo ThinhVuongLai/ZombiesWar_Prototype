@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using App.Combat.Attack;
+using App.Core;
 using App.Core.EventBus;
 using App.Core.Services;
-using App.Enemy.Attack;
 using App.Enemy.States;
 using App.Enemy.Weapon;
 using App.Enemy.Wave;
@@ -21,13 +22,14 @@ namespace App.Enemy
         readonly Dictionary<EnemyStateType, IEnemyState> _states;
         readonly CompositeDisposable _disposables = new();
         readonly EntityManager _entityManager;
+        readonly AttackStrategyRegistry _attackRegistry;
+        readonly WeaponType _attackType;
 
         IEnemyState _currentState;
         Entity _entity;
 
         public IEnemyView View => _view;
         public IPlayerTargetProvider PlayerTarget => _playerTarget;
-        public IEnemyAttackStrategy AttackStrategy { get; }
         public float AttackDamage { get; }
         public float AttackRange { get; }
 
@@ -42,11 +44,12 @@ namespace App.Enemy
             _view = view;
             _playerTarget = playerTarget;
             _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            _attackRegistry = registry;
+            _attackType = config.AttackType;
 
             var weaponConfig = enemyWeaponRegistry?.GetConfig(config.AttackType);
 
             _model = new EnemyModel();
-            AttackStrategy = registry.Get(config.AttackType);
             AttackDamage = weaponConfig?.Damage ?? 10f;
             AttackRange = weaponConfig?.AttackRange ?? 2f;
 
@@ -55,7 +58,6 @@ namespace App.Enemy
             _model.AttackDamage.Value = AttackDamage;
             _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
-            _model.AttackStrategy = AttackStrategy;
 
             _states = new Dictionary<EnemyStateType, IEnemyState>
             {
@@ -178,6 +180,23 @@ namespace App.Enemy
         {
             if (_entity != Entity.Null && _entityManager.Exists(_entity))
                 _entityManager.DestroyEntity(_entity);
+        }
+
+        public void ExecuteAttack()
+        {
+            var strategy = _attackRegistry.Get(_attackType);
+            if (strategy == null) return;
+
+            strategy.Execute(
+                _view.Transform.position, _view.Transform,
+                PlayerTargetECSUpdater.PlayerEntity,
+                _playerTarget.PlayerTransform.position,
+                AttackDamage,
+                new PlayerHealthAccessor(),
+                faceTarget: true,
+                fallbackDamageDealer: dmg =>
+                    ServiceLocator.Resolve<IEventBus>()
+                        .Publish(new EnemyDealtDamageMessage(dmg, _attackType)));
         }
 
         public void Dispose()

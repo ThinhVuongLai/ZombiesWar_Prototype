@@ -1,5 +1,5 @@
+using App.Combat.Attack;
 using App.Core.Services;
-using App.Enemy.Attack;
 using App.Enemy.Weapon;
 using Unity.Entities;
 using Unity.Transforms;
@@ -18,7 +18,7 @@ namespace App.Enemy
 
         void Awake()
         {
-            _attackStrategyRegistry = new AttackStrategyRegistry(
+            _attackStrategyRegistry = AttackStrategyRegistry.CreateForEnemy(
                 _enemyWeaponConfigRegistry, _bulletConfigRegistry);
         }
 
