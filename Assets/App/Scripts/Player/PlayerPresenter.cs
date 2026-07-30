@@ -29,7 +29,6 @@ namespace App.Player
         readonly EntityManager _entityManager;
         readonly WeaponConfigRegistry _weaponConfigRegistry;
         readonly BulletConfigRegistry _bulletConfigRegistry;
-        readonly ThrowWeaponConfigRegistry _throwWeaponConfigRegistry;
         readonly ThrowActionRegistry _throwActionRegistry;
 
         Entity _weaponTargetEntity;
@@ -39,8 +38,7 @@ namespace App.Player
         bool _playerHealthResolved;
 
         BulletConfig _currentBulletConfig;
-        ThrowWeaponConfig _currentThrowWeaponConfig;
-        WeaponConfig _currentWeaponConfig;
+        WeaponBase _currentWeaponConfig;
         WeaponType _currentWeaponType;
         float _currentMeleeDamage;
         float _currentMeleeRange;
@@ -61,15 +59,13 @@ namespace App.Player
         public bool HasCombatTarget => _combatModel.HasTarget.Value;
 
         public PlayerPresenter(IPlayerView view, IPlayerInputProvider input, IEventBus eventBus,
-            WeaponConfigRegistry weaponConfigRegistry, BulletConfigRegistry bulletConfigRegistry,
-            ThrowWeaponConfigRegistry throwWeaponConfigRegistry = null)
+            WeaponConfigRegistry weaponConfigRegistry, BulletConfigRegistry bulletConfigRegistry)
         {
             _view = view;
             _input = input;
             _eventBus = eventBus;
             _weaponConfigRegistry = weaponConfigRegistry;
             _bulletConfigRegistry = bulletConfigRegistry;
-            _throwWeaponConfigRegistry = throwWeaponConfigRegistry;
             _throwActionRegistry = new ThrowActionRegistry();
 
             _model = new PlayerModel();
@@ -183,7 +179,6 @@ namespace App.Player
             if (weaponConfig == null)
             {
                 _currentBulletConfig = null;
-                _currentThrowWeaponConfig = null;
                 _currentWeaponConfig = null;
                 _currentWeaponType = WeaponType.Melee;
                 return;
@@ -193,16 +188,14 @@ namespace App.Player
             _currentWeaponType = weaponConfig.WeaponType;
             _combatModel.AttackCooldown.Value = weaponConfig.AttackCooldown;
 
-            if (weaponConfig.WeaponType == WeaponType.Range)
+            if (weaponConfig is RangeWeaponConfig rangeConfig)
             {
-                _currentBulletConfig = _bulletConfigRegistry?.GetConfig(weaponConfig.BulletId);
-                _currentThrowWeaponConfig = null;
+                _currentBulletConfig = _bulletConfigRegistry?.GetConfig(rangeConfig.BulletId);
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
                 UpdateWeaponECSRadius(weaponConfig.AttackRange);
             }
-            else if (weaponConfig.WeaponType == WeaponType.Throwing)
+            else if (weaponConfig is ThrowWeaponConfig)
             {
-                _currentThrowWeaponConfig = _throwWeaponConfigRegistry?.GetConfig(weaponId);
                 _currentBulletConfig = null;
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
                 UpdateWeaponECSRadius(weaponConfig.AttackRange);
@@ -210,7 +203,6 @@ namespace App.Player
             else
             {
                 _currentBulletConfig = null;
-                _currentThrowWeaponConfig = null;
                 _currentMeleeDamage = weaponConfig.Damage;
                 _currentMeleeRange = weaponConfig.AttackRange;
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
@@ -245,7 +237,7 @@ namespace App.Player
             {
                 TryMeleeAttack(data);
             }
-            else if (_currentWeaponType == WeaponType.Throwing && _currentThrowWeaponConfig != null)
+            else if (_currentWeaponType == WeaponType.Throwing && _currentWeaponConfig is ThrowWeaponConfig)
             {
                 TryThrowingAttack(data);
             }
@@ -290,7 +282,8 @@ namespace App.Player
         {
             _lastAttackTime = Time.time;
 
-            var config = _currentThrowWeaponConfig;
+            var config = _currentWeaponConfig as ThrowWeaponConfig;
+            if (config == null) return;
             var targetEntity = data.CurrentTargetEntity;
             if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity))
                 return;
@@ -332,7 +325,8 @@ namespace App.Player
             }
 
             var throwAction = _throwActionRegistry.GetAction(config.ActionType);
-            thrownObj.Initialize(config, throwAction, velocity);
+            thrownObj.Initialize(config.ObjectLifespan, config.ActionRadius, config.Damage,
+                config.GravityScale, throwAction, velocity);
         }
 
         public void Dispose()

@@ -2,7 +2,6 @@ using System;
 using App.Core.Services;
 using UnityEngine;
 using ZombiesWar.Bullet;
-using ZombiesWar.ThrowingWeapon;
 using ZombiesWar.Weapon;
 
 namespace App.Player
@@ -12,7 +11,6 @@ namespace App.Player
     {
         [SerializeField] WeaponConfigRegistry _weaponConfigRegistry;
         [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
-        [SerializeField] ThrowWeaponConfigRegistry _throwWeaponConfigRegistry;
 
         CharacterController _characterController;
         PlayerPresenter _presenter;
@@ -28,7 +26,7 @@ namespace App.Player
             _characterController = GetComponent<CharacterController>();
             var input = ServiceLocator.Resolve<IPlayerInputProvider>();
             var eventBus = ServiceLocator.Resolve<Core.EventBus.IEventBus>();
-            _presenter = new PlayerPresenter(this, input, eventBus, _weaponConfigRegistry, _bulletConfigRegistry, _throwWeaponConfigRegistry);
+            _presenter = new PlayerPresenter(this, input, eventBus, _weaponConfigRegistry, _bulletConfigRegistry);
         }
 
         void OnDestroy()

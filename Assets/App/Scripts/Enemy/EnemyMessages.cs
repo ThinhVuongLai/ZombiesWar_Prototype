@@ -3,9 +3,9 @@ using Unity.Entities;
 public readonly struct EnemyDealtDamageMessage
 {
     public readonly float Damage;
-    public readonly EnemyAttackType AttackType;
+    public readonly WeaponType AttackType;
 
-    public EnemyDealtDamageMessage(float damage, EnemyAttackType attackType)
+    public EnemyDealtDamageMessage(float damage, WeaponType attackType)
     {
         Damage = damage;
         AttackType = attackType;

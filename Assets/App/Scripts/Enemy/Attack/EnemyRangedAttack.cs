@@ -13,7 +13,7 @@ namespace App.Enemy.Attack
         readonly BulletConfig _bulletConfig;
         readonly float _bulletDamage;
 
-        public EnemyAttackType AttackType => EnemyAttackType.Ranged;
+        public WeaponType AttackType => WeaponType.Range;
 
         public EnemyRangedAttack(BulletConfig bulletConfig, float bulletDamage)
         {
@@ -33,7 +33,7 @@ namespace App.Enemy.Attack
             else
             {
                 var eventBus = ServiceLocator.Resolve<IEventBus>();
-                eventBus.Publish(new EnemyDealtDamageMessage(damage, EnemyAttackType.Ranged));
+                eventBus.Publish(new EnemyDealtDamageMessage(damage, WeaponType.Range));
             }
         }
 

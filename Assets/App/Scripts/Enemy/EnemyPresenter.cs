@@ -47,7 +47,7 @@ namespace App.Enemy
 
             _model = new EnemyModel();
             AttackStrategy = registry.Get(config.AttackType);
-            AttackDamage = weaponConfig?.AttackDamage ?? 10f;
+            AttackDamage = weaponConfig?.Damage ?? 10f;
             AttackRange = weaponConfig?.AttackRange ?? 2f;
 
             _model.MoveSpeed.Value = config.MoveSpeed;

@@ -13,9 +13,44 @@ MonoBehaviour:
   m_Name: WeaponConfigRegistry
   m_EditorClassIdentifier: 
   _configs:
-  - _weaponId: 0
-    _weaponType: 1
-    _bulletId: 0
-    _attackCooldown: 1
-    _damage: 10
-    _attackRange: 2
+  - rid: 886955830288842755
+  - rid: 886955830288842760
+  - rid: 886955830288842758
+  references:
+    version: 2
+    RefIds:
+    - rid: 886955830288842755
+      type: {class: RangeWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponId: 0
+        _weaponType: 0
+        _attackCooldown: 0.5
+        _damage: 10
+        _attackRange: 1.5
+        _bulletId: 0
+    - rid: 886955830288842758
+      type: {class: ThrowWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponId: 2
+        _weaponType: 2
+        _attackCooldown: 0.5
+        _damage: 10
+        _attackRange: 2
+        _throwAngle: 45
+        _minThrowForce: 5
+        _maxThrowForce: 20
+        _throwSpeed: 10
+        _actionType: 1
+        _actionRadius: 3
+        _objectLifespan: 5
+        _gravityScale: 1
+        _objectPrefab: {fileID: 0}
+    - rid: 886955830288842760
+      type: {class: RangeWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponId: 1
+        _weaponType: 1
+        _attackCooldown: 0.5
+        _damage: 10
+        _attackRange: 2
+        _bulletId: 0

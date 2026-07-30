@@ -4,7 +4,7 @@ namespace App.Enemy.Attack
 {
     public interface IEnemyAttackStrategy
     {
-        EnemyAttackType AttackType { get; }
+        WeaponType AttackType { get; }
         void Execute(IEnemyView view, IPlayerTargetProvider target, float damage);
     }
 }

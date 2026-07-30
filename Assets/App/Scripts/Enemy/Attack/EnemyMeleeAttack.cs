@@ -8,7 +8,7 @@ namespace App.Enemy.Attack
 {
     public class EnemyMeleeAttack : IEnemyAttackStrategy
     {
-        public EnemyAttackType AttackType => EnemyAttackType.Melee;
+        public WeaponType AttackType => WeaponType.Melee;
 
         public void Execute(IEnemyView view, IPlayerTargetProvider target, float damage)
         {
@@ -28,7 +28,7 @@ namespace App.Enemy.Attack
             }
 
             var eventBus = Core.Services.ServiceLocator.Resolve<Core.EventBus.IEventBus>();
-            eventBus.Publish(new EnemyDealtDamageMessage(damage, EnemyAttackType.Melee));
+            eventBus.Publish(new EnemyDealtDamageMessage(damage, WeaponType.Melee));
         }
 
         static void FacePlayer(IEnemyView view, IPlayerTargetProvider target)

@@ -6,10 +6,3 @@ public enum EnemyDetectionState : byte
     InDetectionRange,
     InAttackRange
 }
-
-public enum EnemyAttackType : byte
-{
-    None = 0,
-    Melee = 1,
-    Ranged = 2,
-}

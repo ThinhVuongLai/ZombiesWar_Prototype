@@ -14,13 +14,14 @@ namespace ZombiesWar.ThrowingWeapon
         bool _executed;
         Rigidbody _rb;
 
-        public void Initialize(ThrowWeaponConfig config, IThrowAction action, Vector3 velocity)
+        public void Initialize(float lifespan, float actionRadius, float damage,
+            float gravityScale, IThrowAction action, Vector3 velocity)
         {
-            _lifespan = config.ObjectLifespan;
+            _lifespan = lifespan;
             _action = action;
-            _actionRadius = config.ActionRadius;
-            _actionDamage = config.ActionDamage;
-            _gravityScale = config.GravityScale;
+            _actionRadius = actionRadius;
+            _actionDamage = damage;
+            _gravityScale = gravityScale;
 
             _rb = GetComponent<Rigidbody>();
             _rb.useGravity = false;

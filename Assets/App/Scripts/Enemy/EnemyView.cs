@@ -7,12 +7,12 @@ namespace App.Enemy
 {
     public readonly struct EnemyViewConfig
     {
-        public readonly EnemyAttackType AttackType;
+        public readonly WeaponType AttackType;
         public readonly float MoveSpeed;
         public readonly float Health;
         public readonly float DetectionRange;
 
-        public EnemyViewConfig(EnemyAttackType attackType, float moveSpeed, float health,
+        public EnemyViewConfig(WeaponType attackType, float moveSpeed, float health,
             float detectionRange)
         {
             AttackType = attackType;
@@ -25,7 +25,7 @@ namespace App.Enemy
     [RequireComponent(typeof(NavMeshAgent))]
     public class EnemyView : MonoBehaviour, IEnemyView, IDamageable
     {
-        [SerializeField] EnemyAttackType _attackType = EnemyAttackType.Melee;
+        [SerializeField] WeaponType _attackType = WeaponType.Melee;
 
         [Header("Stats")]
         [SerializeField] float _moveSpeed = 3.5f;
