@@ -1,12 +1,12 @@
+using App.Core.Installers;
 using App.Core.Services;
 using App.Enemy;
+using App.Enemy.Wave;
+using App.JoystickInput;
+using App.Player;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
-using App.Core.Installers;
-using App.JoystickInput;
-using App.Player;
-using App.Enemy.Wave;
 using ZombiesWar.Bullet;
 
 namespace App.Core

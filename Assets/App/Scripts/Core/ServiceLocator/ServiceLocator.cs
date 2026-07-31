@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Concurrent;
 using VContainer;
 
 namespace App.Core.Services
 {
     public static class ServiceLocator
     {
-        private static IObjectResolver _resolver;
-        private static volatile bool _initialized;
-        private static readonly object _lock = new();
+        static readonly ConcurrentDictionary<Type, object> _manualRegistry = new();
+        static IObjectResolver _resolver;
+        static volatile bool _initialized;
+        static readonly object _lock = new();
 
         public static void Initialize(IObjectResolver resolver)
         {
@@ -25,16 +27,30 @@ namespace App.Core.Services
             }
         }
 
+        public static void Register<T>(T instance)
+        {
+            if (instance == null)
+                throw new ArgumentNullException(nameof(instance));
+            _manualRegistry[typeof(T)] = instance;
+        }
+
         public static T Resolve<T>()
         {
+            if (_manualRegistry.TryGetValue(typeof(T), out var manualInstance))
+                return (T)manualInstance;
+
             ThrowIfNotInitialized();
             return _resolver.Resolve<T>();
         }
 
         public static object Resolve(Type type)
         {
-            ThrowIfNotInitialized();
             if (type == null) throw new ArgumentNullException(nameof(type));
+
+            if (_manualRegistry.TryGetValue(type, out var manualInstance))
+                return manualInstance;
+
+            ThrowIfNotInitialized();
             return _resolver.Resolve(type);
         }
 
@@ -53,6 +69,7 @@ namespace App.Core.Services
             {
                 _resolver = null;
                 _initialized = false;
+                _manualRegistry.Clear();
             }
         }
 #endif
