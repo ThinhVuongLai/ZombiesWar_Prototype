@@ -3,6 +3,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
 using App.Player.ECS;
+using System.Diagnostics;
 
 namespace ZombiesWar.Bullet.ECS
 {
@@ -93,6 +94,8 @@ namespace ZombiesWar.Bullet.ECS
                         {
                             Value = math.max(enemyHealths[j].Value - bulletDatas[i].Damage, 0f)
                         };
+
+                        UnityEngine.Debug.Log($"Enemy Get Damge {enemyHealths[j].Value}");
 
                         bulletLifeDatas[i] = new BulletLifeData
                         {

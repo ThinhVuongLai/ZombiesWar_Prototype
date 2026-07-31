@@ -12,6 +12,7 @@ using R3;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using System.Diagnostics;
 
 namespace App.Enemy
 {
@@ -168,10 +169,14 @@ namespace App.Enemy
             health.Value -= damage;
             _entityManager.SetComponentData(_entity, health);
 
+            UnityEngine.Debug.Log($"Enemy Get Damage, {health}");
+
             if (health.Value <= 0f)
             {
                 ServiceLocator.Resolve<IEventBus>().Publish(new EnemyDefeatedMessage());
                 TransitionTo(EnemyStateType.Die);
+
+                UnityEngine.Debug.Log($"Change to Die");
             }
         }
 

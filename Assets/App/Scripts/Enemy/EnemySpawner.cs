@@ -15,7 +15,7 @@ namespace App.Enemy
 
         AttackStrategyRegistry _attackStrategyRegistry;
 
-        void Awake()
+        void Start()
         {
             var cm = ServiceLocator.Resolve<ConfigManager>();
             _attackStrategyRegistry = AttackStrategyRegistry.CreateForEnemy(

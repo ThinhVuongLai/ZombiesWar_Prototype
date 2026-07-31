@@ -84,12 +84,12 @@ namespace App.Enemy
         public IHealthBarView CreateHealthBar()
         {
             var cm = ServiceLocator.Resolve<ConfigManager>();
-            if (cm.HealthBarConfig == null) return null;
+            if (cm.EnemyHealthBarConfig == null) return null;
 
             var go = new GameObject("HealthBar");
             go.transform.SetParent(transform, false);
             var view = go.AddComponent<HealthBarView>();
-            view.Initialize(cm.HealthBarConfig, transform);
+            view.Initialize(cm.EnemyHealthBarConfig, transform);
             return view;
         }
     }

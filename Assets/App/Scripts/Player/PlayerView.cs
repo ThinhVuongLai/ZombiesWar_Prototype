@@ -22,7 +22,7 @@ namespace App.Player
 
         public bool IsAlive => _presenter?.IsAlive ?? true;
 
-        void Awake()
+        void Start()
         {
             _characterController = GetComponent<CharacterController>();
             var cm = ServiceLocator.Resolve<ConfigManager>();

@@ -1,4 +1,5 @@
 using App.Enemy;
+using UnityEngine;
 
 namespace App.Enemy.States
 {
@@ -12,7 +13,10 @@ namespace App.Enemy.States
             presenter.DestroyECSCombatState();
         }
 
-        public void Update(EnemyPresenter presenter) { }
+        public void Update(EnemyPresenter presenter)
+        {
+            Debug.Log("in Die");
+        }
 
         public void Exit(EnemyPresenter presenter) { }
     }

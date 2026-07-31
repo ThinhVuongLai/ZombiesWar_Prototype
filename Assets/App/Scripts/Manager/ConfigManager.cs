@@ -15,6 +15,7 @@ namespace App.Core
         [SerializeField] WeaponConfigRegistry _weaponConfigRegistry;
         [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
         [SerializeField] HealthBarConfig _healthBarConfig;
+        [SerializeField] HealthBarConfig _enemyHealthBarConfig;
         [SerializeField] EnemyWeaponConfigRegistry _enemyWeaponConfigRegistry;
         [SerializeField] WaveSpawnerConfig _waveSpawnerConfig;
 
@@ -22,6 +23,7 @@ namespace App.Core
         public WeaponConfigRegistry WeaponConfigRegistry => _weaponConfigRegistry;
         public BulletConfigRegistry BulletConfigRegistry => _bulletConfigRegistry;
         public HealthBarConfig HealthBarConfig => _healthBarConfig;
+        public HealthBarConfig EnemyHealthBarConfig => _enemyHealthBarConfig;
         public EnemyWeaponConfigRegistry EnemyWeaponConfigRegistry => _enemyWeaponConfigRegistry;
         public WaveSpawnerConfig WaveSpawnerConfig => _waveSpawnerConfig;
 

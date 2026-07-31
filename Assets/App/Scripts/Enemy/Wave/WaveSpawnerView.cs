@@ -57,7 +57,7 @@ namespace App.Enemy.Wave
             }
         }
 
-        void Awake()
+        void Start()
         {
             var cm = ServiceLocator.Resolve<ConfigManager>();
             _manager = ServiceLocator.Resolve<WaveSpawnerManager>();
