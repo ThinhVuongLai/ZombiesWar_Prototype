@@ -40,9 +40,10 @@ namespace App.Enemy
         public float AttackDamage { get; }
         public float AttackRange { get; }
 
+        float _lastAttackTime;
+
         // Cached from ECS (read after SimulationSystemGroup completes, in LateUpdate)
         public EnemyDetectionState CachedDetectionState { get; private set; }
-        public bool CachedNeedsCombatResult { get; private set; }
 
         public EnemyPresenter(IEnemyView view, in EnemyViewConfig config,
             AttackStrategyRegistry registry, EnemyWeaponConfigRegistry enemyWeaponRegistry,
@@ -122,9 +123,7 @@ namespace App.Enemy
             {
                 em.SetComponentData(entity, new EnemyCombatState
                 {
-                    LastAttackTime = 0f,
                     DetectionState = EnemyDetectionState.None,
-                    NeedsCombatResult = false,
                 });
             }
         }
@@ -148,7 +147,6 @@ namespace App.Enemy
             {
                 var combat = _entityManager.GetComponentData<EnemyCombatState>(_entity);
                 CachedDetectionState = combat.DetectionState;
-                CachedNeedsCombatResult = combat.NeedsCombatResult;
             }
 
             if (_entityManager.HasComponent<EnemyHealth>(_entity))
@@ -197,14 +195,16 @@ namespace App.Enemy
             }
         }
 
-        public void ResetNeedsCombatResult()
+        public bool TryAttack(float currentTime)
         {
-            if (_entity == Entity.Null || !_entityManager.HasComponent<EnemyCombatState>(_entity))
-                return;
+            var cooldown = _model.AttackCooldown.Value;
+            if (currentTime - _lastAttackTime < cooldown)
+                return false;
 
-            var combat = _entityManager.GetComponentData<EnemyCombatState>(_entity);
-            combat.NeedsCombatResult = false;
-            _entityManager.SetComponentData(_entity, combat);
+            _lastAttackTime = currentTime;
+            ExecuteAttack();
+            _view.PlayAnimation(_attackAnimation);
+            return true;
         }
 
         public void DestroyECSCombatState()

@@ -27,11 +27,7 @@ namespace App.Enemy.States
                 return;
             }
 
-            if (presenter.CachedNeedsCombatResult)
-            {
-                presenter.ExecuteAttack();
-                presenter.ResetNeedsCombatResult();
-            }
+            presenter.TryAttack(UnityEngine.Time.time);
         }
 
         public void Exit(EnemyPresenter presenter) { }

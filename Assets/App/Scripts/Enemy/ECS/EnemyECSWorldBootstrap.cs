@@ -45,7 +45,6 @@ public static class EnemyECSWorldBootstrap
         {
             var enemyGroup = world.CreateSystemManaged<EnemySystemGroup>();
             enemyGroup.AddSystemToUpdateList(world.CreateSystem<EnemyDetectionSystem>());
-            enemyGroup.AddSystemToUpdateList(world.CreateSystem<EnemyCombatSystem>());
             simGroup.AddSystemToUpdateList(enemyGroup);
 
             simGroup.AddSystemToUpdateList(world.CreateSystem<PlayerWeaponDetectionSystem>());
