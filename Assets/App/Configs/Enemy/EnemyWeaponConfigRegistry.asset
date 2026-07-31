@@ -22,5 +22,5 @@ MonoBehaviour:
       data:
         _weaponType: 0
         _damage: 10
-        _attackRange: 2
-        _attackCooldown: 1.5
+        _attackRange: 1.2
+        _attackCooldown: 0.5

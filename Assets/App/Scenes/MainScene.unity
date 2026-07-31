@@ -657,8 +657,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7c353a3288ace04b9bb832c6a804d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
-    type: 3}
 --- !u!4 &1042270688
 Transform:
   m_ObjectHideFlags: 0
@@ -1156,6 +1154,7 @@ MonoBehaviour:
   _enemyWeaponConfigRegistry: {fileID: 11400000, guid: 55ff0d3739d8d48479ba053d068527e0,
     type: 2}
   _waveSpawnerConfig: {fileID: 11400000, guid: b7e329c3c41be2748ae6c8ef48690627, type: 2}
+  _enemyConfig: {fileID: 11400000, guid: ae062f7a687710c4c89491ea45e63f79, type: 2}
 --- !u!1 &1895676840
 GameObject:
   m_ObjectHideFlags: 0

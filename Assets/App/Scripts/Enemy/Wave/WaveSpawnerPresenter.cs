@@ -79,11 +79,10 @@ namespace App.Enemy.Wave
 
             _eventBus.Publish(new WaveStartedMessage(index, waveConfig.EnemyCount));
 
-            var prefab = waveConfig.EnemyPrefab;
             for (int i = 0; i < waveConfig.EnemyCount; i++)
             {
                 var pos = GetRandomSpawnPosition(waveConfig.SpawnRadius);
-                _enemySpawner.SpawnEnemy(pos, prefab);
+                _enemySpawner.SpawnEnemy(pos, waveConfig.EnemyId);
                 _eventBus.Publish(new EnemySpawnedMessage());
             }
 

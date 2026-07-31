@@ -1,4 +1,5 @@
 using App.Core.Services;
+using App.Enemy;
 using App.Enemy.Weapon;
 using App.Enemy.Wave;
 using App.HealthBar;
@@ -18,6 +19,7 @@ namespace App.Core
         [SerializeField] HealthBarConfig _enemyHealthBarConfig;
         [SerializeField] EnemyWeaponConfigRegistry _enemyWeaponConfigRegistry;
         [SerializeField] WaveSpawnerConfig _waveSpawnerConfig;
+        [SerializeField] EnemyConfig _enemyConfig;
 
         public PlayerConfig PlayerConfig => _playerConfig;
         public WeaponConfigRegistry WeaponConfigRegistry => _weaponConfigRegistry;
@@ -26,6 +28,7 @@ namespace App.Core
         public HealthBarConfig EnemyHealthBarConfig => _enemyHealthBarConfig;
         public EnemyWeaponConfigRegistry EnemyWeaponConfigRegistry => _enemyWeaponConfigRegistry;
         public WaveSpawnerConfig WaveSpawnerConfig => _waveSpawnerConfig;
+        public EnemyConfig EnemyConfig => _enemyConfig;
 
         void Awake()
         {

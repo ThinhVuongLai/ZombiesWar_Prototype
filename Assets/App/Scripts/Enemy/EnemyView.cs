@@ -8,20 +8,30 @@ using ZombiesWar.ThrowingWeapon;
 
 namespace App.Enemy
 {
-    public readonly struct EnemyViewConfig
+    public struct EnemyViewConfig
     {
         public readonly WeaponType AttackType;
         public readonly float MoveSpeed;
         public readonly float Health;
         public readonly float DetectionRange;
+        public readonly string IdleAnimationName;
+        public readonly string MoveAnimationName;
+        public readonly string AttackAnimationName;
+        public readonly string DeadAnimationName;
 
         public EnemyViewConfig(WeaponType attackType, float moveSpeed, float health,
-            float detectionRange)
+            float detectionRange,
+            string idleAnimationName = null, string moveAnimationName = null,
+            string attackAnimationName = null, string deadAnimationName = null)
         {
             AttackType = attackType;
             MoveSpeed = moveSpeed;
             Health = health;
             DetectionRange = detectionRange;
+            IdleAnimationName = idleAnimationName;
+            MoveAnimationName = moveAnimationName;
+            AttackAnimationName = attackAnimationName;
+            DeadAnimationName = deadAnimationName;
         }
     }
 
@@ -34,6 +44,9 @@ namespace App.Enemy
         [SerializeField] float _moveSpeed = 3.5f;
         [SerializeField] float _health = 100f;
         [SerializeField] float _detectionRange = 12f;
+
+        [Header("Animation")]
+        [SerializeField] Animator _animator;
 
         NavMeshAgent _agent;
         EnemyViewConfig _config;
@@ -51,6 +64,11 @@ namespace App.Enemy
         {
             _agent = GetComponent<NavMeshAgent>();
             _config = new EnemyViewConfig(_attackType, _moveSpeed, _health, _detectionRange);
+        }
+
+        public void SetConfig(EnemyViewConfig config)
+        {
+            _config = config;
         }
 
         void OnDestroy()
@@ -74,6 +92,12 @@ namespace App.Enemy
         {
             if (_agent != null)
                 _agent.enabled = enabled;
+        }
+
+        public void PlayAnimation(string animationName, int layerIndex = 0)
+        {
+            if (_animator != null && !string.IsNullOrEmpty(animationName))
+                _animator.Play(animationName, layerIndex);
         }
 
         void IDamageable.TakeDamage(float damage)

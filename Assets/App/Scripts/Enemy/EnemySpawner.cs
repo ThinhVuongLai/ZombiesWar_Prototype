@@ -11,8 +11,6 @@ namespace App.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] GameObject _enemyPrefab;
-
         AttackStrategyRegistry _attackStrategyRegistry;
 
         void Start()
@@ -22,12 +20,13 @@ namespace App.Enemy
                 cm.EnemyWeaponConfigRegistry, cm.BulletConfigRegistry);
         }
 
-        public EnemyView SpawnEnemy(Vector3 position, GameObject overridePrefab = null)
+        public EnemyView SpawnEnemy(Vector3 position, int enemyId)
         {
-            var prefab = overridePrefab != null ? overridePrefab : _enemyPrefab;
-            if (prefab == null) return null;
+            var cm = ServiceLocator.Resolve<ConfigManager>();
+            var enemyInfor = cm.EnemyConfig?.GetEnemyInfor(enemyId);
+            if (enemyInfor?.EnemyPrefab == null) return null;
 
-            var go = Instantiate(prefab, position, Quaternion.identity);
+            var go = Instantiate(enemyInfor.EnemyPrefab, position, Quaternion.identity);
             var enemyView = go.GetComponent<EnemyView>();
 
             if (enemyView == null)
@@ -36,10 +35,16 @@ namespace App.Enemy
                 return null;
             }
 
-            var cm = ServiceLocator.Resolve<ConfigManager>();
             var playerTarget = ServiceLocator.Resolve<IPlayerTargetProvider>();
 
-            var presenter = new EnemyPresenter(enemyView, enemyView.Config,
+            var viewConfig = enemyView.Config;
+            var config = new EnemyViewConfig(viewConfig.AttackType, viewConfig.MoveSpeed,
+                viewConfig.Health, viewConfig.DetectionRange,
+                enemyInfor.IdleAnimationName, enemyInfor.MoveAnimationName,
+                enemyInfor.AttackAnimationName, enemyInfor.DeadAnimationName);
+            enemyView.SetConfig(config);
+
+            var presenter = new EnemyPresenter(enemyView, config,
                 _attackStrategyRegistry, cm.EnemyWeaponConfigRegistry, playerTarget);
 
             var em = World.DefaultGameObjectInjectionWorld.EntityManager;

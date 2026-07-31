@@ -12,6 +12,7 @@ namespace App.Enemy
         bool HasPath { get; }
         float RemainingDistance { get; }
         void SetAgentEnabled(bool enabled);
+        void PlayAnimation(string animationName, int layerIndex = 0);
         Action OnDestroyed { get; set; }
         Action<float> TakeExternalDamage { get; set; }
         IHealthBarView CreateHealthBar();

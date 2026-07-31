@@ -26,6 +26,10 @@ namespace App.Enemy
         readonly EntityManager _entityManager;
         readonly AttackStrategyRegistry _attackRegistry;
         readonly WeaponType _attackType;
+        readonly string _idleAnimation;
+        readonly string _moveAnimation;
+        readonly string _attackAnimation;
+        readonly string _deadAnimation;
 
         IEnemyState _currentState;
         Entity _entity;
@@ -49,6 +53,10 @@ namespace App.Enemy
             _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             _attackRegistry = registry;
             _attackType = config.AttackType;
+            _idleAnimation = config.IdleAnimationName;
+            _moveAnimation = config.MoveAnimationName;
+            _attackAnimation = config.AttackAnimationName;
+            _deadAnimation = config.DeadAnimationName;
 
             var weaponConfig = enemyWeaponRegistry?.GetConfig(config.AttackType);
 
@@ -157,6 +165,15 @@ namespace App.Enemy
             _currentState?.Exit(this);
             _currentState = _states[newState];
             _model.CurrentState.Value = newState;
+
+            switch (newState)
+            {
+                case EnemyStateType.Idle: _view.PlayAnimation(_idleAnimation); break;
+                case EnemyStateType.Move: _view.PlayAnimation(_moveAnimation); break;
+                case EnemyStateType.Attack: _view.PlayAnimation(_attackAnimation); break;
+                case EnemyStateType.Die: _view.PlayAnimation(_deadAnimation); break;
+            }
+
             _currentState.Enter(this);
         }
 

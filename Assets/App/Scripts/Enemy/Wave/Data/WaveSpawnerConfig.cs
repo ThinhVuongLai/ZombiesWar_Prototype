@@ -6,7 +6,7 @@ namespace App.Enemy.Wave
     [Serializable]
     public class WaveEntry
     {
-        public GameObject EnemyPrefab;
+        public int EnemyId;
         public int EnemyCount = 3;
         public float SpawnRadius = 30f;
         public float IntervalBeforeNext = 10f;
