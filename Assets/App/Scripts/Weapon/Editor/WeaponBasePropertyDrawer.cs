@@ -64,6 +64,8 @@ namespace ZombiesWar.Weapon.Editor
             DrawField(ref y, position, property, "_attackCooldown", lineHeight, spacing);
             DrawField(ref y, position, property, "_damage", lineHeight, spacing);
             DrawField(ref y, position, property, "_attackRange", lineHeight, spacing);
+            DrawField(ref y, position, property, "_attackIdleAnimation", lineHeight, spacing);
+            DrawField(ref y, position, property, "_attackAnimation", lineHeight, spacing);
 
             switch (currentType)
             {
@@ -104,6 +106,8 @@ namespace ZombiesWar.Weapon.Editor
             var oldCooldown = property.FindPropertyRelative("_attackCooldown").floatValue;
             var oldDamage = property.FindPropertyRelative("_damage").floatValue;
             var oldRange = property.FindPropertyRelative("_attackRange").floatValue;
+            var oldAttackIdleAnim = property.FindPropertyRelative("_attackIdleAnimation").stringValue;
+            var oldAttackAnim = property.FindPropertyRelative("_attackAnimation").stringValue;
 
             WeaponBase newInstance = newType switch
             {
@@ -120,6 +124,8 @@ namespace ZombiesWar.Weapon.Editor
             property.FindPropertyRelative("_attackCooldown").floatValue = oldCooldown;
             property.FindPropertyRelative("_damage").floatValue = oldDamage;
             property.FindPropertyRelative("_attackRange").floatValue = oldRange;
+            property.FindPropertyRelative("_attackIdleAnimation").stringValue = oldAttackIdleAnim;
+            property.FindPropertyRelative("_attackAnimation").stringValue = oldAttackAnim;
 
             property.serializedObject.ApplyModifiedProperties();
         }
@@ -144,7 +150,7 @@ namespace ZombiesWar.Weapon.Editor
                 _ => 0,
             };
 
-            int fieldLines = 5 + extraLines;
+            int fieldLines = 7 + extraLines;
             return (fieldLines + 1) * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using App.Core;
 using App.Core.Services;
 using App.HealthBar;
 using UnityEngine;
@@ -10,9 +11,7 @@ namespace App.Player
     [RequireComponent(typeof(CharacterController))]
     public class PlayerView : MonoBehaviour, IPlayerView, IPlayerTargetProvider
     {
-        [SerializeField] WeaponConfigRegistry _weaponConfigRegistry;
-        [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
-        [SerializeField] HealthBarConfig _healthBarConfig;
+        [SerializeField] Animator _animator;
 
         CharacterController _characterController;
         PlayerPresenter _presenter;
@@ -26,9 +25,10 @@ namespace App.Player
         void Awake()
         {
             _characterController = GetComponent<CharacterController>();
+            var cm = ServiceLocator.Resolve<ConfigManager>();
             var input = ServiceLocator.Resolve<IPlayerInputProvider>();
             var eventBus = ServiceLocator.Resolve<Core.EventBus.IEventBus>();
-            _presenter = new PlayerPresenter(this, input, eventBus, _weaponConfigRegistry, _bulletConfigRegistry);
+            _presenter = new PlayerPresenter(this, cm.PlayerConfig, input, eventBus, cm.WeaponConfigRegistry, cm.BulletConfigRegistry);
         }
 
         void OnDestroy()
@@ -48,14 +48,27 @@ namespace App.Player
             transform.rotation = Quaternion.Euler(0f, targetRotation.eulerAngles.y, 0f);
         }
 
+        public void PlayMoveAnimation(string animationName, int layerIndex)
+        {
+            if (_animator == null || string.IsNullOrEmpty(animationName)) return;
+            _animator.Play(animationName, layerIndex);
+        }
+
+        public void PlayAttackAnimation(string animationName, int layerIndex)
+        {
+            if (_animator == null || string.IsNullOrEmpty(animationName)) return;
+            _animator.Play(animationName, layerIndex);
+        }
+
         public IHealthBarView CreateHealthBar()
         {
-            if (_healthBarConfig == null) return null;
+            var cm = ServiceLocator.Resolve<ConfigManager>();
+            if (cm.HealthBarConfig == null) return null;
 
             var go = new GameObject("HealthBar");
             go.transform.SetParent(transform, false);
             var view = go.AddComponent<HealthBarView>();
-            view.Initialize(_healthBarConfig, transform);
+            view.Initialize(cm.HealthBarConfig, transform);
             return view;
         }
     }

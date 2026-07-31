@@ -1,3 +1,4 @@
+using App.Core;
 using App.Core.Services;
 using UnityEngine;
 
@@ -6,7 +7,6 @@ namespace App.Enemy.Wave
     public class WaveSpawnerView : MonoBehaviour, IWaveSpawnerView
     {
         [SerializeField] Camera _gameCamera;
-        [SerializeField] WaveSpawnerConfig _config;
         [SerializeField] EnemySpawner _enemySpawner;
 
         WaveSpawnerManager _manager;
@@ -59,14 +59,16 @@ namespace App.Enemy.Wave
 
         void Awake()
         {
+            var cm = ServiceLocator.Resolve<ConfigManager>();
             _manager = ServiceLocator.Resolve<WaveSpawnerManager>();
-            _manager.Initialize(this, _config, _enemySpawner);
+            _manager.Initialize(this, cm.WaveSpawnerConfig, _enemySpawner);
         }
 
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
-            if (_config == null || _config.Waves == null)
+            var cm = ServiceLocator.Resolve<ConfigManager>();
+            if (cm?.WaveSpawnerConfig == null || cm.WaveSpawnerConfig.Waves == null)
                 return;
 
             var cam = _gameCamera;
@@ -75,7 +77,7 @@ namespace App.Enemy.Wave
             var center = cam.transform.position;
 
             Gizmos.color = Color.yellow;
-            foreach (var wave in _config.Waves)
+            foreach (var wave in cm.WaveSpawnerConfig.Waves)
             {
                 if (wave == null) continue;
                 Gizmos.DrawWireSphere(center, wave.SpawnRadius);

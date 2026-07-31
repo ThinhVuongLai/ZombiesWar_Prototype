@@ -15,16 +15,16 @@ MonoBehaviour:
   _waves:
   - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
       type: 3}
-    EnemyCount: 3
+    EnemyCount: 1
     SpawnRadius: 100
     IntervalBeforeNext: 10
   - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
       type: 3}
-    EnemyCount: 10
+    EnemyCount: 1
     SpawnRadius: 100
     IntervalBeforeNext: 10
   - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
       type: 3}
-    EnemyCount: 50
+    EnemyCount: 1
     SpawnRadius: 100
     IntervalBeforeNext: 10

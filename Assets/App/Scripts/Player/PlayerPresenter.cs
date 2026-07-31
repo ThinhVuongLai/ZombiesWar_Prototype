@@ -20,6 +20,7 @@ namespace App.Player
     public class PlayerPresenter : IDisposable
     {
         readonly IPlayerView _view;
+        readonly PlayerConfig _playerConfig;
         readonly PlayerModel _model;
         readonly IPlayerInputProvider _input;
         readonly IEventBus _eventBus;
@@ -33,6 +34,7 @@ namespace App.Player
 
         Entity _weaponTargetEntity;
         bool _weaponEntityResolved;
+        bool _hasUpdateWeapon;
 
         Entity _playerHealthEntity;
         bool _playerHealthResolved;
@@ -44,6 +46,7 @@ namespace App.Player
 
         IPlayerState _currentState;
         HealthBarPresenter _healthBarPresenter;
+        bool _hadCombatTarget;
 
         public const float Gravity = -9.81f;
         public float VerticalVelocity { get; set; }
@@ -57,10 +60,11 @@ namespace App.Player
         public Vector3 CombatTargetDirection => _combatModel.TargetDirection.Value;
         public bool HasCombatTarget => _combatModel.HasTarget.Value;
 
-        public PlayerPresenter(IPlayerView view, IPlayerInputProvider input, IEventBus eventBus,
+        public PlayerPresenter(IPlayerView view, PlayerConfig playerConfig, IPlayerInputProvider input, IEventBus eventBus,
             WeaponConfigRegistry weaponConfigRegistry, BulletConfigRegistry bulletConfigRegistry)
         {
             _view = view;
+            _playerConfig = playerConfig;
             _input = input;
             _eventBus = eventBus;
             _weaponConfigRegistry = weaponConfigRegistry;
@@ -114,13 +118,31 @@ namespace App.Player
             }
 
             _eventBus.Publish(new PlayerStateUpdatedMessage(_model.CurrentState.Value));
+
+            if(UnityEngine.Input.GetKeyDown(KeyCode.Q))
+            {
+                PlayAttackAnimation();
+            }
         }
 
         void OnLateUpdate()
         {
             ResolveECSReferences();
+            
+            bool hadTarget = _hadCombatTarget;
+            _hadCombatTarget = HasCombatTarget;
+            
             SyncCombatTarget();
             SyncPlayerHealth();
+            
+            if (!hadTarget && HasCombatTarget)
+            {
+                PlayAttackAnimation();
+            }
+            else if (hadTarget && !HasCombatTarget)
+            {
+                PlayAttackIdleAnimation();
+            }
         }
 
         void ResolveECSReferences()
@@ -131,7 +153,16 @@ namespace App.Player
                 if (query.CalculateEntityCount() > 0)
                 {
                     _weaponTargetEntity = query.GetSingletonEntity();
+
                     _weaponEntityResolved = true;
+                }
+            }
+
+            if (!_hasUpdateWeapon)
+            {
+                if (_currentWeaponConfig != null)
+                {
+                    UpdateWeaponECSRadius(_currentWeaponConfig.AttackRange);
                 }
             }
 
@@ -172,6 +203,25 @@ namespace App.Player
             _currentState = _states[newState];
             _model.CurrentState.Value = newState;
             _currentState.Enter(this);
+            
+            PlayStateAnimation(newState);
+        }
+        
+        void PlayStateAnimation(PlayerStateType state)
+        {
+            if (_playerConfig == null) return;
+            
+            var animName = state switch
+            {
+                PlayerStateType.Idle => _playerConfig.IdleAnimation,
+                PlayerStateType.Move => _playerConfig.MoveAnimation,
+                _ => null,
+            };
+            
+            if (!string.IsNullOrEmpty(animName))
+            {
+                _view.PlayMoveAnimation(animName, _playerConfig.MoveAnimationLayerIndex);
+            }
         }
 
         public void Die()
@@ -199,27 +249,28 @@ namespace App.Player
             {
                 _currentBulletConfig = _bulletConfigRegistry?.GetConfig(rangeConfig.BulletId);
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
-                UpdateWeaponECSRadius(weaponConfig.AttackRange);
             }
             else if (weaponConfig is ThrowWeaponConfig)
             {
                 _currentBulletConfig = null;
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
-                UpdateWeaponECSRadius(weaponConfig.AttackRange);
             }
             else
             {
                 _currentBulletConfig = null;
                 _combatModel.AttackRadius.Value = weaponConfig.AttackRange;
-                UpdateWeaponECSRadius(weaponConfig.AttackRange);
             }
 
+            UpdateWeaponECSRadius(weaponConfig.AttackRange);
+
             AttackStrategyRegistry.RegisterFromConfig(_attackRegistry, weaponConfig, _bulletConfigRegistry);
+            
+            PlayAttackIdleAnimation();
         }
 
         void UpdateWeaponECSRadius(float radius)
         {
-            if (_weaponEntityResolved && _weaponTargetEntity != Entity.Null)
+            if (!_hasUpdateWeapon && _weaponTargetEntity != Entity.Null)
             {
                 _entityManager.SetComponentData(_weaponTargetEntity, new PlayerWeaponTargetData
                 {
@@ -229,6 +280,28 @@ namespace App.Player
                     TargetDirection = float3.zero,
                     HasTarget = false,
                 });
+
+                _hasUpdateWeapon = true;
+            }
+        }
+
+        void PlayAttackAnimation()
+        {
+            if (_playerConfig == null || _currentWeaponConfig == null) return;
+            var animName = _currentWeaponConfig.AttackAnimation;
+            if (!string.IsNullOrEmpty(animName))
+            {
+                _view.PlayAttackAnimation(animName, _playerConfig.AttackAnimationLayerIndex);
+            }
+        }
+        
+        void PlayAttackIdleAnimation()
+        {
+            if (_playerConfig == null || _currentWeaponConfig == null) return;
+            var animName = _currentWeaponConfig.AttackIdleAnimation;
+            if (!string.IsNullOrEmpty(animName))
+            {
+                _view.PlayAttackAnimation(animName, _playerConfig.AttackAnimationLayerIndex);
             }
         }
 
@@ -257,6 +330,8 @@ namespace App.Player
                 faceTarget: false);
 
             _lastAttackTime = Time.time;
+            
+            PlayAttackAnimation();
         }
 
         public void Dispose()

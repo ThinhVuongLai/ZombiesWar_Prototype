@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a92c9f8bd21b8e74eaa7755ac111c65c, type: 3}
+  m_Name: PlayerConfig
+  m_EditorClassIdentifier: 
+  _moveAnimationLayerIndex: 2
+  _attackAnimationLayerIndex: 1
+  _idleAnimation: Solider_combat_idle
+  _moveAnimation: Solider_combat_run

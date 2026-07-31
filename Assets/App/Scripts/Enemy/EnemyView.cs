@@ -1,4 +1,6 @@
 using System;
+using App.Core;
+using App.Core.Services;
 using App.HealthBar;
 using UnityEngine;
 using UnityEngine.AI;
@@ -32,9 +34,6 @@ namespace App.Enemy
         [SerializeField] float _moveSpeed = 3.5f;
         [SerializeField] float _health = 100f;
         [SerializeField] float _detectionRange = 12f;
-
-        [Header("Health Bar")]
-        [SerializeField] HealthBarConfig _healthBarConfig;
 
         NavMeshAgent _agent;
         EnemyViewConfig _config;
@@ -84,12 +83,13 @@ namespace App.Enemy
 
         public IHealthBarView CreateHealthBar()
         {
-            if (_healthBarConfig == null) return null;
+            var cm = ServiceLocator.Resolve<ConfigManager>();
+            if (cm.HealthBarConfig == null) return null;
 
             var go = new GameObject("HealthBar");
             go.transform.SetParent(transform, false);
             var view = go.AddComponent<HealthBarView>();
-            view.Initialize(_healthBarConfig, transform);
+            view.Initialize(cm.HealthBarConfig, transform);
             return view;
         }
     }

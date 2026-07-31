@@ -1,4 +1,5 @@
 using App.Combat.Attack;
+using App.Core;
 using App.Core.Services;
 using App.Enemy.Weapon;
 using Unity.Entities;
@@ -11,15 +12,14 @@ namespace App.Enemy
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField] GameObject _enemyPrefab;
-        [SerializeField] EnemyWeaponConfigRegistry _enemyWeaponConfigRegistry;
-        [SerializeField] BulletConfigRegistry _bulletConfigRegistry;
 
         AttackStrategyRegistry _attackStrategyRegistry;
 
         void Awake()
         {
+            var cm = ServiceLocator.Resolve<ConfigManager>();
             _attackStrategyRegistry = AttackStrategyRegistry.CreateForEnemy(
-                _enemyWeaponConfigRegistry, _bulletConfigRegistry);
+                cm.EnemyWeaponConfigRegistry, cm.BulletConfigRegistry);
         }
 
         public EnemyView SpawnEnemy(Vector3 position, GameObject overridePrefab = null)
@@ -36,10 +36,11 @@ namespace App.Enemy
                 return null;
             }
 
+            var cm = ServiceLocator.Resolve<ConfigManager>();
             var playerTarget = ServiceLocator.Resolve<IPlayerTargetProvider>();
 
             var presenter = new EnemyPresenter(enemyView, enemyView.Config,
-                _attackStrategyRegistry, _enemyWeaponConfigRegistry, playerTarget);
+                _attackStrategyRegistry, cm.EnemyWeaponConfigRegistry, playerTarget);
 
             var em = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entity = em.CreateEntity(

@@ -14,12 +14,16 @@ namespace ZombiesWar.Weapon
         [SerializeField] protected float _attackCooldown = 0.5f;
         [SerializeField] protected float _damage = 10f;
         [SerializeField] protected float _attackRange = 2f;
+        [SerializeField] protected string _attackIdleAnimation;
+        [SerializeField] protected string _attackAnimation;
 
         public int WeaponId => _weaponId;
         public WeaponType WeaponType => _weaponType;
         public float AttackCooldown => _attackCooldown;
         public float Damage => _damage;
         public float AttackRange => _attackRange;
+        public string AttackIdleAnimation => _attackIdleAnimation;
+        public string AttackAnimation => _attackAnimation;
     }
 
     [Serializable]
