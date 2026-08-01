@@ -15,7 +15,6 @@ namespace App.Enemy.States
 
         public void Update(EnemyPresenter presenter)
         {
-            Debug.Log("in Die");
         }
 
         public void Exit(EnemyPresenter presenter) { }

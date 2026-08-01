@@ -7,11 +7,11 @@ namespace App.JoystickInput
 {
     public class JoystickInputView : MonoBehaviour, IJoystickInputView, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
-        [SerializeField] RectTransform _backgroundRT;
-        [SerializeField] RectTransform _handleRT;
-        [SerializeField] float _maxRadius = 100f;
+        [SerializeField] RectTransform _backgroundRectTransform;
+        [SerializeField] RectTransform _handleRectTransform;
+        [SerializeField] float _maximumRadius = 100f;
 
-        public float MaxRadius => _maxRadius;
+        public float MaximumRadius => _maximumRadius;
 
         public Action<Vector2> OnDragStarted { get; set; }
         public Action<Vector2> OnDragUpdated { get; set; }
@@ -51,33 +51,33 @@ namespace App.JoystickInput
         Vector2 GetLocalInput(PointerEventData eventData)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _backgroundRT, eventData.position, eventData.pressEventCamera, out Vector2 localPoint);
+                _backgroundRectTransform, eventData.position, eventData.pressEventCamera, out Vector2 localPoint);
 
-            return Vector2.ClampMagnitude(localPoint, _maxRadius);
+            return Vector2.ClampMagnitude(localPoint, _maximumRadius);
         }
 
         public void SetHandlePosition(Vector2 localPosition)
         {
-            _handleRT.anchoredPosition = localPosition;
+            _handleRectTransform.anchoredPosition = localPosition;
         }
 
         public void SetActive(bool active)
         {
-            _backgroundRT.gameObject.SetActive(active);
+            _backgroundRectTransform.gameObject.SetActive(active);
         }
 
         public void ResetToCenter()
         {
-            _handleRT.anchoredPosition = Vector2.zero;
+            _handleRectTransform.anchoredPosition = Vector2.zero;
         }
 
         static void EnsureEventSystem()
         {
             if (FindAnyObjectByType<EventSystem>() == null)
             {
-                var go = new GameObject("EventSystem");
-                go.AddComponent<EventSystem>();
-                go.AddComponent<StandaloneInputModule>();
+                var gameObject = new GameObject("EventSystem");
+                gameObject.AddComponent<EventSystem>();
+                gameObject.AddComponent<StandaloneInputModule>();
             }
         }
     }

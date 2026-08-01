@@ -42,9 +42,9 @@ namespace App.Core.EventBus
             if (_disposed) return;
             _disposed = true;
 
-            foreach (var kvp in _subjects)
+            foreach (var entry in _subjects)
             {
-                (kvp.Value as IDisposable)?.Dispose();
+                (entry.Value as IDisposable)?.Dispose();
             }
 
             _subjects.Clear();

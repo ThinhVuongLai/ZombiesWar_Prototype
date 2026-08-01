@@ -25,10 +25,10 @@ namespace App.Player
         void Start()
         {
             _characterController = GetComponent<CharacterController>();
-            var cm = ServiceLocator.Resolve<ConfigManager>();
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
             var input = ServiceLocator.Resolve<IPlayerInputProvider>();
             var eventBus = ServiceLocator.Resolve<Core.EventBus.IEventBus>();
-            _presenter = new PlayerPresenter(this, cm.PlayerConfig, input, eventBus, cm.WeaponConfigRegistry, cm.BulletConfigRegistry);
+            _presenter = new PlayerPresenter(this, configManager.PlayerConfig, input, eventBus, configManager.WeaponConfigRegistry, configManager.BulletConfigRegistry);
         }
 
         void OnDestroy()
@@ -62,13 +62,13 @@ namespace App.Player
 
         public IHealthBarView CreateHealthBar()
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
-            if (cm.HealthBarConfig == null) return null;
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
+            if (configManager.HealthBarConfig == null) return null;
 
-            var go = new GameObject("HealthBar");
-            go.transform.SetParent(transform, false);
-            var view = go.AddComponent<HealthBarView>();
-            view.Initialize(cm.HealthBarConfig, transform);
+            var healthBarObject = new GameObject("HealthBar");
+            healthBarObject.transform.SetParent(transform, false);
+            var view = healthBarObject.AddComponent<HealthBarView>();
+            view.Initialize(configManager.HealthBarConfig, transform);
             return view;
         }
     }

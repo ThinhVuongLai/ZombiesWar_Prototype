@@ -10,17 +10,17 @@ namespace ZombiesWar.Bullet.ECS
         public static Entity SpawnBullet(BulletConfig config, float damage, float3 startPosition, Entity targetEntity)
         {
             var world = World.DefaultGameObjectInjectionWorld;
-            var em = world.EntityManager;
+            var entityManager = world.EntityManager;
 
             float lifetime = config.Speed > 0f ? config.Range / config.Speed : 0f;
 
-            var entity = em.CreateEntity(
+            var entity = entityManager.CreateEntity(
                 typeof(BulletData),
                 typeof(BulletLifeData),
                 typeof(LocalTransform)
             );
 
-            em.SetComponentData(entity, new BulletData
+            entityManager.SetComponentData(entity, new BulletData
             {
                 Speed = config.Speed,
                 Damage = damage,
@@ -29,7 +29,7 @@ namespace ZombiesWar.Bullet.ECS
                 TargetEntity = targetEntity,
             });
 
-            em.SetComponentData(entity, new BulletLifeData
+            entityManager.SetComponentData(entity, new BulletLifeData
             {
                 RemainingLife = lifetime,
                 StartPosition = startPosition,
@@ -37,7 +37,7 @@ namespace ZombiesWar.Bullet.ECS
                 HasHit = false,
             });
 
-            em.SetComponentData(entity, LocalTransform.FromPosition(startPosition));
+            entityManager.SetComponentData(entity, LocalTransform.FromPosition(startPosition));
 
             return entity;
         }

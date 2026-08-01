@@ -90,7 +90,7 @@ namespace App.Player
             if (healthBarView != null)
             {
                 _healthBarPresenter = new HealthBarPresenter(
-                    healthBarView, _model.Health, _model.MaxHealth.Value);
+                    healthBarView, _model.Health, _model.MaximumHealth.Value);
             }
 
             Observable.EveryUpdate()
@@ -100,6 +100,16 @@ namespace App.Player
             Observable.EveryUpdate(UnityFrameProvider.PostLateUpdate)
                 .Subscribe(_ => OnLateUpdate())
                 .AddTo(_disposables);
+
+            _eventBus.On<EnemyDealtDamageMessage>().Subscribe(message =>
+            {
+                if (_playerHealthEntity == Entity.Null)
+                    return;
+
+                var health = _entityManager.GetComponentData<PlayerHealth>(_playerHealthEntity);
+                health.Value = math.max(health.Value - message.Damage, 0f);
+                _entityManager.SetComponentData(_playerHealthEntity, health);
+            }).AddTo(_disposables);
 
             SetWeapon(0);
         }
@@ -189,7 +199,7 @@ namespace App.Player
 
             var health = _entityManager.GetComponentData<PlayerHealth>(_playerHealthEntity);
             _model.Health.Value = health.Value;
-            _model.MaxHealth.Value = health.MaxValue;
+            _model.MaximumHealth.Value = health.MaxValue;
 
             if (health.Value <= 0f && _model.IsAlive.Value)
             {
@@ -211,16 +221,16 @@ namespace App.Player
         {
             if (_playerConfig == null) return;
             
-            var animName = state switch
+            var animationName = state switch
             {
                 PlayerStateType.Idle => _playerConfig.IdleAnimation,
                 PlayerStateType.Move => _playerConfig.MoveAnimation,
                 _ => null,
             };
             
-            if (!string.IsNullOrEmpty(animName))
+            if (!string.IsNullOrEmpty(animationName))
             {
-                _view.PlayMoveAnimation(animName, _playerConfig.MoveAnimationLayerIndex);
+                _view.PlayMoveAnimation(animationName, _playerConfig.MoveAnimationLayerIndex);
             }
         }
 
@@ -288,20 +298,20 @@ namespace App.Player
         void PlayAttackAnimation()
         {
             if (_playerConfig == null || _currentWeaponConfig == null) return;
-            var animName = _currentWeaponConfig.AttackAnimation;
-            if (!string.IsNullOrEmpty(animName))
+            var animationName = _currentWeaponConfig.AttackAnimation;
+            if (!string.IsNullOrEmpty(animationName))
             {
-                _view.PlayAttackAnimation(animName, _playerConfig.AttackAnimationLayerIndex);
+                _view.PlayAttackAnimation(animationName, _playerConfig.AttackAnimationLayerIndex);
             }
         }
         
         void PlayAttackIdleAnimation()
         {
             if (_playerConfig == null || _currentWeaponConfig == null) return;
-            var animName = _currentWeaponConfig.AttackIdleAnimation;
-            if (!string.IsNullOrEmpty(animName))
+            var animationName = _currentWeaponConfig.AttackIdleAnimation;
+            if (!string.IsNullOrEmpty(animationName))
             {
-                _view.PlayAttackAnimation(animName, _playerConfig.AttackAnimationLayerIndex);
+                _view.PlayAttackAnimation(animationName, _playerConfig.AttackAnimationLayerIndex);
             }
         }
 
@@ -317,14 +327,14 @@ namespace App.Player
             if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity)) return;
             if (!_entityManager.HasComponent<LocalTransform>(targetEntity)) return;
 
-            var targetPos = (Vector3)_entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
+            var targetPosition = (Vector3)_entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
 
             var strategy = _attackRegistry.Get(_currentWeaponType);
             if (strategy == null) return;
 
             strategy.Execute(
                 _view.Transform.position, _view.Transform,
-                targetEntity, targetPos,
+                targetEntity, targetPosition,
                 _currentWeaponConfig.Damage,
                 new EnemyHealthAccessor(),
                 faceTarget: false);

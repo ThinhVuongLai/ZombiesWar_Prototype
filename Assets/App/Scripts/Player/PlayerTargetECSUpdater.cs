@@ -10,7 +10,7 @@ namespace App.Core
     {
         Entity _singletonEntity;
         Entity _playerEntity;
-        EntityManager _em;
+        EntityManager _entityManager;
         IPlayerTargetProvider _playerTarget;
 
         public static Entity PlayerEntity { get; private set; }
@@ -18,12 +18,12 @@ namespace App.Core
         public void Initialize(IPlayerTargetProvider playerTarget)
         {
             _playerTarget = playerTarget;
-            _em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-            var query = _em.CreateEntityQuery(typeof(PlayerTargetECSData));
+            var query = _entityManager.CreateEntityQuery(typeof(PlayerTargetECSData));
             _singletonEntity = query.GetSingletonEntity();
 
-            var playerQuery = _em.CreateEntityQuery(typeof(PlayerHealth), typeof(LocalTransform));
+            var playerQuery = _entityManager.CreateEntityQuery(typeof(PlayerHealth), typeof(LocalTransform));
             _playerEntity = playerQuery.GetSingletonEntity();
             PlayerEntity = _playerEntity;
         }
@@ -33,17 +33,17 @@ namespace App.Core
             if (_playerTarget == null || _singletonEntity == Entity.Null)
                 return;
 
-            var pos = (float3)_playerTarget.PlayerTransform.position;
+            var position = (float3)_playerTarget.PlayerTransform.position;
 
-            _em.SetComponentData(_singletonEntity, new PlayerTargetECSData
+            _entityManager.SetComponentData(_singletonEntity, new PlayerTargetECSData
             {
-                Position = pos,
+                Position = position,
                 IsAlive = _playerTarget.IsAlive,
             });
 
-            if (_playerEntity != Entity.Null && _em.Exists(_playerEntity))
+            if (_playerEntity != Entity.Null && _entityManager.Exists(_playerEntity))
             {
-                _em.SetComponentData(_playerEntity, LocalTransform.FromPosition(pos));
+                _entityManager.SetComponentData(_playerEntity, LocalTransform.FromPosition(position));
             }
         }
     }

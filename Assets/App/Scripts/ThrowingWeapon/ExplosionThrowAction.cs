@@ -9,9 +9,9 @@ namespace ZombiesWar.ThrowingWeapon
         public void Execute(Vector3 position, float radius, float damage)
         {
             var colliders = Physics.OverlapSphere(position, radius);
-            foreach (var col in colliders)
+            foreach (var collider in colliders)
             {
-                if (col.TryGetComponent<IDamageable>(out var damageable))
+                if (collider.TryGetComponent<IDamageable>(out var damageable))
                 {
                     damageable.TakeDamage(damage);
                 }

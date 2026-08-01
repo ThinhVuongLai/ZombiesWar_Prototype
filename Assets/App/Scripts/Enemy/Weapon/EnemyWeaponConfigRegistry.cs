@@ -46,8 +46,8 @@ namespace App.Enemy.Weapon
         [SerializeField] GameObject _objectPrefab;
 
         public float ThrowAngle => _throwAngle;
-        public float MinThrowForce => _minThrowForce;
-        public float MaxThrowForce => _maxThrowForce;
+        public float MinimumThrowForce => _minThrowForce;
+        public float MaximumThrowForce => _maxThrowForce;
         public ThrowActionType ActionType => _actionType;
         public float ActionRadius => _actionRadius;
         public float ObjectLifespan => _objectLifespan;
@@ -67,10 +67,10 @@ namespace App.Enemy.Weapon
         {
             _lookup.Clear();
             if (_configs == null) return;
-            foreach (var c in _configs)
+            foreach (var config in _configs)
             {
-                if (c != null)
-                    _lookup[c.WeaponType] = c;
+                if (config != null)
+                    _lookup[config.WeaponType] = config;
             }
         }
 

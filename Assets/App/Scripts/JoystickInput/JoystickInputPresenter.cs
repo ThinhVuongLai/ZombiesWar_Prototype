@@ -20,15 +20,15 @@ namespace App.JoystickInput
             _view.OnDragEnded += HandleDragEnded;
         }
 
-        void HandleDragStarted(Vector2 clampedLocalPos)
+        void HandleDragStarted(Vector2 clampedLocalPosition)
         {
             _model.IsActive.Value = true;
-            ProcessInput(clampedLocalPos);
+            ProcessInput(clampedLocalPosition);
         }
 
-        void HandleDragUpdated(Vector2 clampedLocalPos)
+        void HandleDragUpdated(Vector2 clampedLocalPosition)
         {
-            ProcessInput(clampedLocalPos);
+            ProcessInput(clampedLocalPosition);
         }
 
         void HandleDragEnded()
@@ -39,11 +39,11 @@ namespace App.JoystickInput
             _view.ResetToCenter();
         }
 
-        void ProcessInput(Vector2 clampedLocalPos)
+        void ProcessInput(Vector2 clampedLocalPosition)
         {
-            float magnitude = clampedLocalPos.magnitude / _view.MaxRadius;
-            _view.SetHandlePosition(clampedLocalPos);
-            _model.Direction.Value = clampedLocalPos.normalized;
+            float magnitude = clampedLocalPosition.magnitude / _view.MaximumRadius;
+            _view.SetHandlePosition(clampedLocalPosition);
+            _model.Direction.Value = clampedLocalPosition.normalized;
             _model.Magnitude.Value = Mathf.Clamp01(magnitude);
         }
 

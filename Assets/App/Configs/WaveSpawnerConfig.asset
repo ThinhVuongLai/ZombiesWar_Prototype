@@ -13,18 +13,19 @@ MonoBehaviour:
   m_Name: WaveSpawnerConfig
   m_EditorClassIdentifier: 
   _waves:
-  - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
-      type: 3}
-    EnemyCount: 1
+  - EnemyId: 0
+    EnemyCount: 10
     SpawnRadius: 100
     IntervalBeforeNext: 10
-  - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
-      type: 3}
-    EnemyCount: 1
+  - EnemyId: 0
+    EnemyCount: 15
     SpawnRadius: 100
     IntervalBeforeNext: 10
-  - EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
-      type: 3}
-    EnemyCount: 1
+  - EnemyId: 0
+    EnemyCount: 20
+    SpawnRadius: 100
+    IntervalBeforeNext: 10
+  - EnemyId: 0
+    EnemyCount: 25
     SpawnRadius: 100
     IntervalBeforeNext: 10

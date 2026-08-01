@@ -81,8 +81,8 @@ namespace App.Enemy.Wave
 
             for (int i = 0; i < waveConfig.EnemyCount; i++)
             {
-                var pos = GetRandomSpawnPosition(waveConfig.SpawnRadius);
-                _enemySpawner.SpawnEnemy(pos, waveConfig.EnemyId);
+                var spawnPosition = GetRandomSpawnPosition(waveConfig.SpawnRadius);
+                _enemySpawner.SpawnEnemy(spawnPosition, waveConfig.EnemyId);
                 _eventBus.Publish(new EnemySpawnedMessage());
             }
 
@@ -126,7 +126,7 @@ namespace App.Enemy.Wave
             _eventBus.Publish(new AllWavesCompletedMessage());
         }
 
-        void OnEnemyDefeated(EnemyDefeatedMessage msg)
+        void OnEnemyDefeated(EnemyDefeatedMessage message)
         {
             if (_model.State.Value != WaveSpawnerState.Active) return;
 
@@ -144,16 +144,16 @@ namespace App.Enemy.Wave
             var screenRadius = Mathf.Max(extents.x, extents.y);
             const float navMeshSampleRadius = 3f;
             const float screenMargin = 1.05f;
-            var minDistance = screenRadius * screenMargin + navMeshSampleRadius;
-            var maxDistance = Mathf.Max(minDistance + 1f, spawnRadius);
+            var minimumDistance = screenRadius * screenMargin + navMeshSampleRadius;
+            var maximumDistance = Mathf.Max(minimumDistance + 1f, spawnRadius);
 
             var center = _view.WorldCenter;
-            const int maxAttempts = 20;
+            const int maximumAttempts = 20;
 
-            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            for (int attempt = 0; attempt < maximumAttempts; attempt++)
             {
                 var angle = Random.Range(0f, Mathf.PI * 2f);
-                var distance = Random.Range(minDistance, maxDistance);
+                var distance = Random.Range(minimumDistance, maximumDistance);
 
                 var candidate = center + new Vector3(Mathf.Cos(angle) * distance, 0f, Mathf.Sin(angle) * distance);
 
@@ -166,7 +166,7 @@ namespace App.Enemy.Wave
 
             // Fallback: place at maxDistance far outside screen
             var fallbackAngle = Random.Range(0f, Mathf.PI * 2f);
-            return center + new Vector3(Mathf.Cos(fallbackAngle) * maxDistance, 0f, Mathf.Sin(fallbackAngle) * maxDistance);
+            return center + new Vector3(Mathf.Cos(fallbackAngle) * maximumDistance, 0f, Mathf.Sin(fallbackAngle) * maximumDistance);
         }
 
         bool IsOutsideScreenExtents(Vector3 position, Vector3 center, Vector2 extents)

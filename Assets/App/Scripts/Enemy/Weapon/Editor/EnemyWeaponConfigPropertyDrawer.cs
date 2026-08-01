@@ -31,10 +31,10 @@ namespace App.Enemy.Weapon.Editor
                 return;
             }
 
-            var y = position.y;
+            var verticalPosition = position.y;
             var width = position.width;
 
-            var foldoutRect = new Rect(position.x, y, width, lineHeight);
+            var foldoutRect = new Rect(position.x, verticalPosition, width, lineHeight);
             property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label, true);
 
             if (!property.isExpanded)
@@ -43,10 +43,10 @@ namespace App.Enemy.Weapon.Editor
                 return;
             }
 
-            y += lineHeight + spacing;
+            verticalPosition += lineHeight + spacing;
 
             var weaponTypeProp = property.FindPropertyRelative("_weaponType");
-            var dropdownRect = new Rect(position.x, y, width, lineHeight);
+            var dropdownRect = new Rect(position.x, verticalPosition, width, lineHeight);
             EditorGUI.BeginChangeCheck();
             EditorGUI.PropertyField(dropdownRect, weaponTypeProp);
             var typeChanged = EditorGUI.EndChangeCheck();
@@ -57,41 +57,41 @@ namespace App.Enemy.Weapon.Editor
                 ReplaceInstance(property, currentType);
             }
 
-            y += lineHeight + spacing;
+            verticalPosition += lineHeight + spacing;
 
-            DrawField(ref y, position, property, "_damage", lineHeight, spacing);
-            DrawField(ref y, position, property, "_attackRange", lineHeight, spacing);
-            DrawField(ref y, position, property, "_attackCooldown", lineHeight, spacing);
+            DrawField(ref verticalPosition, position, property, "_damage", lineHeight, spacing);
+            DrawField(ref verticalPosition, position, property, "_attackRange", lineHeight, spacing);
+            DrawField(ref verticalPosition, position, property, "_attackCooldown", lineHeight, spacing);
 
             switch (currentType)
             {
                 case WeaponType.Range:
-                    DrawField(ref y, position, property, "_bulletId", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_bulletId", lineHeight, spacing);
                     break;
                 case WeaponType.Throwing:
-                    DrawField(ref y, position, property, "_throwAngle", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_minThrowForce", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_maxThrowForce", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_actionType", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_actionRadius", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_objectLifespan", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_gravityScale", lineHeight, spacing);
-                    DrawField(ref y, position, property, "_objectPrefab", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_throwAngle", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_minThrowForce", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_maxThrowForce", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_actionType", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_actionRadius", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_objectLifespan", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_gravityScale", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_objectPrefab", lineHeight, spacing);
                     break;
             }
 
             EditorGUI.EndProperty();
         }
 
-        static void DrawField(ref float y, Rect position, SerializedProperty property,
+        static void DrawField(ref float verticalPosition, Rect position, SerializedProperty property,
             string fieldName, float lineHeight, float spacing)
         {
-            var prop = property.FindPropertyRelative(fieldName);
-            if (prop != null)
+            var relativeProperty = property.FindPropertyRelative(fieldName);
+            if (relativeProperty != null)
             {
                 EditorGUI.PropertyField(
-                    new Rect(position.x, y, position.width, lineHeight), prop);
-                y += lineHeight + spacing;
+                    new Rect(position.x, verticalPosition, position.width, lineHeight), relativeProperty);
+                verticalPosition += lineHeight + spacing;
             }
         }
 

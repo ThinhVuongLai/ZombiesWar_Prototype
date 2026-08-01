@@ -12,7 +12,7 @@ namespace ZombiesWar.ThrowingWeapon
         float _actionDamage;
         float _gravityScale;
         bool _executed;
-        Rigidbody _rb;
+        Rigidbody _rigidbody;
 
         public void Initialize(float lifespan, float actionRadius, float damage,
             float gravityScale, IThrowAction action, Vector3 velocity)
@@ -23,14 +23,14 @@ namespace ZombiesWar.ThrowingWeapon
             _actionDamage = damage;
             _gravityScale = gravityScale;
 
-            _rb = GetComponent<Rigidbody>();
-            _rb.useGravity = false;
-            _rb.velocity = velocity;
+            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody.useGravity = false;
+            _rigidbody.velocity = velocity;
         }
 
         void FixedUpdate()
         {
-            _rb.AddForce(Physics.gravity * _gravityScale, ForceMode.Acceleration);
+            _rigidbody.AddForce(Physics.gravity * _gravityScale, ForceMode.Acceleration);
         }
 
         void Update()

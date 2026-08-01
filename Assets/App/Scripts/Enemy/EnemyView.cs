@@ -107,13 +107,13 @@ namespace App.Enemy
 
         public IHealthBarView CreateHealthBar()
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
-            if (cm.EnemyHealthBarConfig == null) return null;
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
+            if (configManager.EnemyHealthBarConfig == null) return null;
 
-            var go = new GameObject("HealthBar");
-            go.transform.SetParent(transform, false);
-            var view = go.AddComponent<HealthBarView>();
-            view.Initialize(cm.EnemyHealthBarConfig, transform);
+            var healthBarObject = new GameObject("HealthBar");
+            healthBarObject.transform.SetParent(transform, false);
+            var view = healthBarObject.AddComponent<HealthBarView>();
+            view.Initialize(configManager.EnemyHealthBarConfig, transform);
             return view;
         }
     }

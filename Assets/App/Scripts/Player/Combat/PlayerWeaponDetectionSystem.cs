@@ -22,83 +22,83 @@ public partial struct PlayerWeaponDetectionSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        float3 playerPos = SystemAPI.GetSingleton<PlayerTargetECSData>().Position;
-        var weaponDataRW = SystemAPI.GetSingletonRW<PlayerWeaponTargetData>();
+        float3 playerPosition = SystemAPI.GetSingleton<PlayerTargetECSData>().Position;
+        var weaponDataReadWrite = SystemAPI.GetSingletonRW<PlayerWeaponTargetData>();
 
-        float attackRadiusSq = weaponDataRW.ValueRO.AttackRadius * weaponDataRW.ValueRO.AttackRadius;
-        Entity currentTarget = weaponDataRW.ValueRO.CurrentTargetEntity;
+        float attackRadiusSquared = weaponDataReadWrite.ValueRO.AttackRadius * weaponDataReadWrite.ValueRO.AttackRadius;
+        Entity currentTarget = weaponDataReadWrite.ValueRO.CurrentTargetEntity;
 
-        if (TryKeepCurrentTarget(state.EntityManager, currentTarget, playerPos, attackRadiusSq, ref weaponDataRW))
+        if (TryKeepCurrentTarget(state.EntityManager, currentTarget, playerPosition, attackRadiusSquared, ref weaponDataReadWrite))
             return;
 
-        FindNewTarget(_enemyQuery, playerPos, attackRadiusSq, ref weaponDataRW);
+        FindNewTarget(_enemyQuery, playerPosition, attackRadiusSquared, ref weaponDataReadWrite);
     }
 
-    static bool TryKeepCurrentTarget(in EntityManager em, Entity currentTarget, float3 playerPos,
-        float attackRadiusSq, ref RefRW<PlayerWeaponTargetData> weaponDataRW)
+    static bool TryKeepCurrentTarget(in EntityManager entityManager, Entity currentTarget, float3 playerPosition,
+        float attackRadiusSquared, ref RefRW<PlayerWeaponTargetData> weaponDataReadWrite)
     {
         if (currentTarget == Entity.Null)
             return false;
 
-        if (!em.Exists(currentTarget))
+        if (!entityManager.Exists(currentTarget))
             return false;
 
-        if (!em.HasComponent<LocalTransform>(currentTarget) || !em.HasComponent<EnemyHealth>(currentTarget))
+        if (!entityManager.HasComponent<LocalTransform>(currentTarget) || !entityManager.HasComponent<EnemyHealth>(currentTarget))
             return false;
 
-        var targetTransform = em.GetComponentData<LocalTransform>(currentTarget);
-        var targetHealth = em.GetComponentData<EnemyHealth>(currentTarget);
+        var targetTransform = entityManager.GetComponentData<LocalTransform>(currentTarget);
+        var targetHealth = entityManager.GetComponentData<EnemyHealth>(currentTarget);
 
-        float sqrDist = math.distancesq(targetTransform.Position, playerPos);
+        float squaredDistance = math.distancesq(targetTransform.Position, playerPosition);
 
-        if (targetHealth.Value > 0f && sqrDist <= attackRadiusSq)
+        if (targetHealth.Value > 0f && squaredDistance <= attackRadiusSquared)
         {
-            float3 dir = targetTransform.Position - playerPos;
-            weaponDataRW.ValueRW.TargetDirection = math.normalize(dir);
+            float3 direction = targetTransform.Position - playerPosition;
+            weaponDataReadWrite.ValueRW.TargetDirection = math.normalize(direction);
             return true;
         }
 
         return false;
     }
 
-    static void FindNewTarget(in EntityQuery query, float3 playerPos, float attackRadiusSq,
-        ref RefRW<PlayerWeaponTargetData> weaponDataRW)
+    static void FindNewTarget(in EntityQuery query, float3 playerPosition, float attackRadiusSquared,
+        ref RefRW<PlayerWeaponTargetData> weaponDataReadWrite)
     {
         using var transforms = query.ToComponentDataArray<LocalTransform>(Allocator.Temp);
         using var healths = query.ToComponentDataArray<EnemyHealth>(Allocator.Temp);
         using var entities = query.ToEntityArray(Allocator.Temp);
 
-        float closestDistSq = float.MaxValue;
+        float closestDistanceSquared = float.MaxValue;
         Entity closestEntity = Entity.Null;
-        float3 closestPos = float3.zero;
+        float3 closestPosition = float3.zero;
 
         for (int i = 0; i < entities.Length; i++)
         {
             if (healths[i].Value <= 0f)
                 continue;
 
-            float sqrDist = math.distancesq(transforms[i].Position, playerPos);
-            if (sqrDist <= attackRadiusSq && sqrDist < closestDistSq)
+            float squaredDistance = math.distancesq(transforms[i].Position, playerPosition);
+            if (squaredDistance <= attackRadiusSquared && squaredDistance < closestDistanceSquared)
             {
-                closestDistSq = sqrDist;
+                closestDistanceSquared = squaredDistance;
                 closestEntity = entities[i];
-                closestPos = transforms[i].Position;
+                closestPosition = transforms[i].Position;
             }
         }
 
         if (closestEntity != Entity.Null)
         {
-            weaponDataRW.ValueRW.CurrentTargetEntity = closestEntity;
-            weaponDataRW.ValueRW.TargetPosition = closestPos;
-            weaponDataRW.ValueRW.TargetDirection = math.normalize(closestPos - playerPos);
-            weaponDataRW.ValueRW.HasTarget = true;
+            weaponDataReadWrite.ValueRW.CurrentTargetEntity = closestEntity;
+            weaponDataReadWrite.ValueRW.TargetPosition = closestPosition;
+            weaponDataReadWrite.ValueRW.TargetDirection = math.normalize(closestPosition - playerPosition);
+            weaponDataReadWrite.ValueRW.HasTarget = true;
         }
         else
         {
-            weaponDataRW.ValueRW.CurrentTargetEntity = Entity.Null;
-            weaponDataRW.ValueRW.TargetPosition = float3.zero;
-            weaponDataRW.ValueRW.TargetDirection = float3.zero;
-            weaponDataRW.ValueRW.HasTarget = false;
+            weaponDataReadWrite.ValueRW.CurrentTargetEntity = Entity.Null;
+            weaponDataReadWrite.ValueRW.TargetPosition = float3.zero;
+            weaponDataReadWrite.ValueRW.TargetDirection = float3.zero;
+            weaponDataReadWrite.ValueRW.HasTarget = false;
         }
     }
 }

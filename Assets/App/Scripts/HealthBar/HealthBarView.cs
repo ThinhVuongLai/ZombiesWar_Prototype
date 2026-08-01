@@ -5,7 +5,7 @@ namespace App.HealthBar
     public class HealthBarView : MonoBehaviour, IHealthBarView
     {
         HealthBarConfig _config;
-        Material _bgMaterial;
+        Material _backgroundMaterial;
         Material _fillMaterial;
         MaterialPropertyBlock _fillPropertyBlock;
         Transform _characterTransform;
@@ -17,7 +17,7 @@ namespace App.HealthBar
 
         void OnDestroy()
         {
-            if (_bgMaterial != null) Destroy(_bgMaterial);
+            if (_backgroundMaterial != null) Destroy(_backgroundMaterial);
             if (_fillMaterial != null) Destroy(_fillMaterial);
             if (_quadMesh != null && _quadMesh.name == "HealthBarQuad")
                 Destroy(_quadMesh);
@@ -30,7 +30,7 @@ namespace App.HealthBar
             _offset = overrideOffset ?? config.Offset;
             _camera = Camera.main;
 
-            _bgMaterial = new Material(config.Material);
+            _backgroundMaterial = new Material(config.Material);
             _fillMaterial = new Material(config.Material);
             _fillPropertyBlock = new MaterialPropertyBlock();
             _quadMesh = config.Mesh != null ? config.Mesh : CreateQuadMesh();
@@ -54,10 +54,10 @@ namespace App.HealthBar
             var billboardRot = Quaternion.LookRotation(
                 _camera.transform.forward, _camera.transform.up);
 
-            _bgMaterial.color = _config.BgColor;
-            var bgMatrix = Matrix4x4.TRS(
-                worldPos, billboardRot, new Vector3(_config.BgSize.x, _config.BgSize.y, 1));
-            Graphics.DrawMesh(_quadMesh, bgMatrix, _bgMaterial, 0);
+            _backgroundMaterial.color = _config.BackgroundColor;
+            var backgroundMatrix = Matrix4x4.TRS(
+                worldPos, billboardRot, new Vector3(_config.BackgroundSize.x, _config.BackgroundSize.y, 1));
+            Graphics.DrawMesh(_quadMesh, backgroundMatrix, _backgroundMaterial, 0);
 
             _fillMaterial.color = _config.FillColor;
             _fillPropertyBlock.SetFloat("_FillAmount", _fillAmount);

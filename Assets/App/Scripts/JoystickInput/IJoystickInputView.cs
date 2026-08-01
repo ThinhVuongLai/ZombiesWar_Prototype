@@ -5,7 +5,7 @@ namespace App.JoystickInput
 {
     public interface IJoystickInputView
     {
-        float MaxRadius { get; }
+        float MaximumRadius { get; }
         Action<Vector2> OnDragStarted { get; set; }
         Action<Vector2> OnDragUpdated { get; set; }
         Action OnDragEnded { get; set; }

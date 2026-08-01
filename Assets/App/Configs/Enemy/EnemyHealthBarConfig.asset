@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _material: {fileID: 2100000, guid: 17ec5475f497889469cac4fecb30a245, type: 2}
   _mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  _offset: {x: 0, y: 2.5, z: 0}
-  _bgSize: {x: 1.5, y: 0.25}
-  _fillSize: {x: 1.4, y: 0.15}
-  _bgColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  _offset: {x: 0, y: 1.2, z: 0}
+  _backgroundSize: {x: 1, y: 0.25}
+  _fillSize: {x: 0.9, y: 0.15}
+  _backgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   _fillColor: {r: 1, g: 0, b: 0.040184975, a: 1}
   _fillSortingOffset: 1

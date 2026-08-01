@@ -11,8 +11,8 @@ namespace App.Player
             builder.Register<IPlayerInputProvider, JoystickPlayerInputAdapter>(Lifetime.Singleton);
             builder.Register<IPlayerTargetProvider>(container =>
             {
-                var go = GameObject.FindGameObjectWithTag("Player");
-                return go != null ? go.GetComponent<PlayerView>() : null;
+                var playerObject = GameObject.FindGameObjectWithTag("Player");
+                return playerObject != null ? playerObject.GetComponent<PlayerView>() : null;
             }, Lifetime.Singleton);
         }
     }

@@ -31,10 +31,10 @@ namespace ZombiesWar.Bullet
         {
             _lookup.Clear();
             if (_configs == null) return;
-            foreach (var c in _configs)
+            foreach (var config in _configs)
             {
-                if (c != null)
-                    _lookup[c.BulletId] = c;
+                if (config != null)
+                    _lookup[config.BulletId] = config;
             }
         }
 

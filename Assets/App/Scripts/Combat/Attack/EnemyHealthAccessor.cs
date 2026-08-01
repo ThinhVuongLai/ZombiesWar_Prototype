@@ -9,13 +9,13 @@ namespace App.Combat.Attack
         {
             if (entity == Entity.Null) return false;
 
-            var em = World.DefaultGameObjectInjectionWorld.EntityManager;
-            if (!em.Exists(entity) || !em.HasComponent<EnemyHealth>(entity))
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            if (!entityManager.Exists(entity) || !entityManager.HasComponent<EnemyHealth>(entity))
                 return false;
 
-            var health = em.GetComponentData<EnemyHealth>(entity);
+            var health = entityManager.GetComponentData<EnemyHealth>(entity);
             health.Value = math.max(health.Value - damage, 0f);
-            em.SetComponentData(entity, health);
+            entityManager.SetComponentData(entity, health);
             return true;
         }
     }

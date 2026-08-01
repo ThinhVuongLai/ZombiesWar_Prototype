@@ -59,25 +59,25 @@ namespace App.Enemy.Wave
 
         void Start()
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
             _manager = ServiceLocator.Resolve<WaveSpawnerManager>();
-            _manager.Initialize(this, cm.WaveSpawnerConfig, _enemySpawner);
+            _manager.Initialize(this, configManager.WaveSpawnerConfig, _enemySpawner);
         }
 
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
-            if (cm?.WaveSpawnerConfig == null || cm.WaveSpawnerConfig.Waves == null)
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
+            if (configManager?.WaveSpawnerConfig == null || configManager.WaveSpawnerConfig.Waves == null)
                 return;
 
-            var cam = _gameCamera;
-            if (cam == null) return;
+            var camera = _gameCamera;
+            if (camera == null) return;
 
-            var center = cam.transform.position;
+            var center = camera.transform.position;
 
             Gizmos.color = Color.yellow;
-            foreach (var wave in cm.WaveSpawnerConfig.Waves)
+            foreach (var wave in configManager.WaveSpawnerConfig.Waves)
             {
                 if (wave == null) continue;
                 Gizmos.DrawWireSphere(center, wave.SpawnRadius);
@@ -87,12 +87,12 @@ namespace App.Enemy.Wave
             Gizmos.color = Color.green;
             var screenCenter = center;
 
-            if (!cam.orthographic)
+            if (!camera.orthographic)
             {
                 var groundPlane = new Plane(Vector3.up, Vector3.zero);
-                if (groundPlane.Raycast(new Ray(center, cam.transform.forward), out var dist))
+                if (groundPlane.Raycast(new Ray(center, camera.transform.forward), out var dist))
                 {
-                    screenCenter = center + cam.transform.forward * dist;
+                    screenCenter = center + camera.transform.forward * dist;
                 }
             }
 

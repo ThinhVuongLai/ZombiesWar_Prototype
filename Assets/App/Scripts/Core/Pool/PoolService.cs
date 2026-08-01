@@ -18,7 +18,7 @@ namespace MagicTile.Pool
             [Tooltip("Number of instances to pre-instantiate at startup.")]
             public int prewarmCount = 10;
             [Tooltip("Maximum inactive instances kept in the pool. Excess are destroyed.")]
-            public int maxSize = 100;
+            public int maximumSize = 100;
         }
 
         [SerializeField] private PoolConfig[] _configs;
@@ -35,7 +35,7 @@ namespace MagicTile.Pool
                 if (config.prefab == null)
                     continue;
 
-                Prewarm(config.prefab, transform, config.prewarmCount, config.maxSize);
+                Prewarm(config.prefab, transform, config.prewarmCount, config.maximumSize);
             }
         }
 
@@ -45,9 +45,9 @@ namespace MagicTile.Pool
         public GameObject Get(GameObject prefab)
         {
             GameObjectPool pool = GetOrCreatePool(prefab);
-            GameObject obj = pool.Get();
-            _poolByInstance[obj] = pool;
-            return obj;
+            GameObject instance = pool.Get();
+            _poolByInstance[instance] = pool;
+            return instance;
         }
 
         /// <summary>
@@ -61,20 +61,20 @@ namespace MagicTile.Pool
         /// <summary>
         /// Returns an instance to its originating pool. Destroys if not from any pool.
         /// </summary>
-        public void Release(GameObject obj)
+        public void Release(GameObject instance)
         {
-            if (obj == null)
+            if (instance == null)
                 return;
 
-            if (_poolByInstance.TryGetValue(obj, out GameObjectPool pool))
+            if (_poolByInstance.TryGetValue(instance, out GameObjectPool pool))
             {
-                _poolByInstance.Remove(obj);
-                pool.Release(obj);
+                _poolByInstance.Remove(instance);
+                pool.Release(instance);
             }
             else
             {
-                Debug.LogWarning($"[PoolService] Object '{obj.name}' was not from any pool. Destroying.");
-                Destroy(obj);
+                Debug.LogWarning($"[PoolService] Object '{instance.name}' was not from any pool. Destroying.");
+                Destroy(instance);
             }
         }
 
@@ -105,7 +105,7 @@ namespace MagicTile.Pool
         /// Pre-registers a pool and prewarms instances for the given prefab.
         /// Does nothing if a pool for this prefab already exists.
         /// </summary>
-        public void Prewarm(GameObject prefab, Transform parent, int prewarmCount, int maxSize = 100)
+        public void Prewarm(GameObject prefab, Transform parent, int prewarmCount, int maximumSize = 100)
         {
             if (prefab == null)
             {
@@ -119,7 +119,7 @@ namespace MagicTile.Pool
                 return;
             }
 
-            var pool = new GameObjectPool(prefab, parent, prewarmCount, maxSize);
+            var pool = new GameObjectPool(prefab, parent, prewarmCount, maximumSize);
             _poolsByPrefab[prefab] = pool;
         }
 

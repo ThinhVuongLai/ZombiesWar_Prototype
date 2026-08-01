@@ -5,13 +5,13 @@ namespace App.HealthBar
     public class HealthBarPresenter
     {
         readonly IHealthBarView _view;
-        readonly float _maxHealth;
+        readonly float _maximumHealth;
         readonly CompositeDisposable _disposables = new();
 
-        public HealthBarPresenter(IHealthBarView view, ReactiveProperty<float> health, float maxHealth)
+        public HealthBarPresenter(IHealthBarView view, ReactiveProperty<float> health, float maximumHealth)
         {
             _view = view;
-            _maxHealth = maxHealth;
+            _maximumHealth = maximumHealth;
 
             health.Subscribe(OnHealthChanged).AddTo(_disposables);
         }
@@ -25,7 +25,7 @@ namespace App.HealthBar
             }
 
             _view.SetVisible(true);
-            _view.SetFillAmount(current / _maxHealth);
+            _view.SetFillAmount(current / _maximumHealth);
         }
 
         public void Dispose()

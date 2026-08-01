@@ -22,8 +22,8 @@ namespace App.Player.States
                 return;
             }
 
-            Vector3 worldDir = new Vector3(direction.x, 0f, direction.y);
-            Vector3 horizontalMotion = worldDir * (magnitude * presenter.MoveSpeed * Time.deltaTime);
+            Vector3 worldDirection = new Vector3(direction.x, 0f, direction.y);
+            Vector3 horizontalMotion = worldDirection * (magnitude * presenter.MoveSpeed * Time.deltaTime);
 
             ApplyGravity(presenter);
 
@@ -32,7 +32,7 @@ namespace App.Player.States
 
             Vector3 faceDirection = presenter.HasCombatTarget
                 ? presenter.CombatTargetDirection
-                : worldDir;
+                : worldDirection;
             presenter.View.FaceDirection(faceDirection);
         }
 

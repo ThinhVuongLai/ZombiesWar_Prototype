@@ -67,7 +67,7 @@ namespace App.Enemy
 
             _model.MoveSpeed.Value = config.MoveSpeed;
             _model.Health.Value = config.Health;
-            _model.MaxHealth.Value = config.Health;
+            _model.MaximumHealth.Value = config.Health;
             _model.AttackDamage.Value = AttackDamage;
             _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
@@ -100,11 +100,11 @@ namespace App.Enemy
         {
             _entity = entity;
 
-            var em = _entityManager;
+            var entityManager = _entityManager;
 
-            if (em.HasComponent<EnemyStats>(entity))
+            if (entityManager.HasComponent<EnemyStats>(entity))
             {
-                em.SetComponentData(entity, new EnemyStats
+                entityManager.SetComponentData(entity, new EnemyStats
                 {
                     MoveSpeed = _model.MoveSpeed.Value,
                     AttackDamage = _model.AttackDamage.Value,
@@ -114,14 +114,14 @@ namespace App.Enemy
                 });
             }
 
-            if (em.HasComponent<EnemyHealth>(entity))
+            if (entityManager.HasComponent<EnemyHealth>(entity))
             {
-                em.SetComponentData(entity, new EnemyHealth { Value = _model.Health.Value });
+                entityManager.SetComponentData(entity, new EnemyHealth { Value = _model.Health.Value });
             }
 
-            if (em.HasComponent<EnemyCombatState>(entity))
+            if (entityManager.HasComponent<EnemyCombatState>(entity))
             {
-                em.SetComponentData(entity, new EnemyCombatState
+                entityManager.SetComponentData(entity, new EnemyCombatState
                 {
                     DetectionState = EnemyDetectionState.None,
                 });
@@ -138,9 +138,9 @@ namespace App.Enemy
 
             if (_entityManager.HasComponent<LocalTransform>(_entity))
             {
-                var lt = _entityManager.GetComponentData<LocalTransform>(_entity);
-                lt.Position = (float3)_view.Transform.position;
-                _entityManager.SetComponentData(_entity, lt);
+                var localTransform = _entityManager.GetComponentData<LocalTransform>(_entity);
+                localTransform.Position = (float3)_view.Transform.position;
+                _entityManager.SetComponentData(_entity, localTransform);
             }
 
             if (_entityManager.HasComponent<EnemyCombatState>(_entity))
@@ -153,6 +153,12 @@ namespace App.Enemy
             {
                 var health = _entityManager.GetComponentData<EnemyHealth>(_entity);
                 _model.Health.Value = health.Value;
+
+                if (health.Value <= 0f && _model.CurrentState.Value != EnemyStateType.Die)
+                {
+                    TransitionTo(EnemyStateType.Die);
+                    return;
+                }
             }
 
             _currentState?.Update(this);
@@ -225,9 +231,9 @@ namespace App.Enemy
                 AttackDamage,
                 new PlayerHealthAccessor(),
                 faceTarget: true,
-                fallbackDamageDealer: dmg =>
+                fallbackDamageDealer: damage =>
                     ServiceLocator.Resolve<IEventBus>()
-                        .Publish(new EnemyDealtDamageMessage(dmg, _attackType)));
+                        .Publish(new EnemyDealtDamageMessage(damage, _attackType)));
         }
 
         public void Dispose()

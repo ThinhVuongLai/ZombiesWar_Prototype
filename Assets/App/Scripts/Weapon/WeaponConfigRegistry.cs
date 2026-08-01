@@ -53,8 +53,8 @@ namespace ZombiesWar.Weapon
         [SerializeField] GameObject _objectPrefab;
 
         public float ThrowAngle => _throwAngle;
-        public float MinThrowForce => _minThrowForce;
-        public float MaxThrowForce => _maxThrowForce;
+        public float MinimumThrowForce => _minThrowForce;
+        public float MaximumThrowForce => _maxThrowForce;
         public float ThrowSpeed => _throwSpeed;
         public ThrowActionType ActionType => _actionType;
         public float ActionRadius => _actionRadius;
@@ -75,10 +75,10 @@ namespace ZombiesWar.Weapon
         {
             _lookup.Clear();
             if (_configs == null) return;
-            foreach (var c in _configs)
+            foreach (var config in _configs)
             {
-                if (c != null)
-                    _lookup[c.WeaponId] = c;
+                if (config != null)
+                    _lookup[config.WeaponId] = config;
             }
         }
 

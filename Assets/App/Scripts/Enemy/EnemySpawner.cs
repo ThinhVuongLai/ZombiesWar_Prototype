@@ -15,23 +15,23 @@ namespace App.Enemy
 
         void Start()
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
             _attackStrategyRegistry = AttackStrategyRegistry.CreateForEnemy(
-                cm.EnemyWeaponConfigRegistry, cm.BulletConfigRegistry);
+                configManager.EnemyWeaponConfigRegistry, configManager.BulletConfigRegistry);
         }
 
         public EnemyView SpawnEnemy(Vector3 position, int enemyId)
         {
-            var cm = ServiceLocator.Resolve<ConfigManager>();
-            var enemyInfor = cm.EnemyConfig?.GetEnemyInfor(enemyId);
+            var configManager = ServiceLocator.Resolve<ConfigManager>();
+            var enemyInfor = configManager.EnemyConfig?.GetEnemyInfor(enemyId);
             if (enemyInfor?.EnemyPrefab == null) return null;
 
-            var go = Instantiate(enemyInfor.EnemyPrefab, position, Quaternion.identity);
-            var enemyView = go.GetComponent<EnemyView>();
+            var enemyInstance = Instantiate(enemyInfor.EnemyPrefab, position, Quaternion.identity);
+            var enemyView = enemyInstance.GetComponent<EnemyView>();
 
             if (enemyView == null)
             {
-                Destroy(go);
+                Destroy(enemyInstance);
                 return null;
             }
 
@@ -45,17 +45,17 @@ namespace App.Enemy
             enemyView.SetConfig(config);
 
             var presenter = new EnemyPresenter(enemyView, config,
-                _attackStrategyRegistry, cm.EnemyWeaponConfigRegistry, playerTarget);
+                _attackStrategyRegistry, configManager.EnemyWeaponConfigRegistry, playerTarget);
 
-            var em = World.DefaultGameObjectInjectionWorld.EntityManager;
-            var entity = em.CreateEntity(
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var entity = entityManager.CreateEntity(
                 typeof(EnemyStats),
                 typeof(EnemyHealth),
                 typeof(EnemyCombatState),
                 typeof(LocalTransform)
             );
 
-            em.SetComponentData(entity, LocalTransform.FromPosition(position));
+            entityManager.SetComponentData(entity, LocalTransform.FromPosition(position));
             presenter.SetEntity(entity);
 
             return enemyView;

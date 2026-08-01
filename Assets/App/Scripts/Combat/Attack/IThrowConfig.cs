@@ -6,8 +6,8 @@ namespace App.Combat.Attack
     public interface IThrowConfig
     {
         float ThrowAngle { get; }
-        float MinThrowForce { get; }
-        float MaxThrowForce { get; }
+        float MinimumThrowForce { get; }
+        float MaximumThrowForce { get; }
         float GravityScale { get; }
         float ObjectLifespan { get; }
         float ActionRadius { get; }
