@@ -52,4 +52,49 @@ public static class EnemyECSWorldBootstrap
             simGroup.AddSystemToUpdateList(world.CreateSystem<BulletSystem>());
         }
     }
+
+    public static void Shutdown()
+    {
+        if (!_initialized) return;
+        _initialized = false;
+
+        var world = World.DefaultGameObjectInjectionWorld;
+        var entityManager = world.EntityManager;
+
+        DestroySingletonEntity<PlayerTargetECSData>(entityManager);
+        DestroySingletonEntity<PlayerHealth>(entityManager);
+        DestroySingletonEntity<PlayerWeaponTargetData>(entityManager);
+
+        var simGroup = world.GetExistingSystemManaged<SimulationSystemGroup>();
+        if (simGroup != null)
+        {
+            RemoveSystemIfExists<BulletSystem>(world, simGroup);
+            RemoveSystemIfExists<PlayerWeaponDetectionSystem>(world, simGroup);
+
+            var enemyGroup = world.GetExistingSystemManaged<EnemySystemGroup>();
+            if (enemyGroup != null)
+            {
+                RemoveSystemIfExists<EnemyDetectionSystem>(world, enemyGroup);
+                simGroup.RemoveSystemFromUpdateList(enemyGroup);
+            }
+        }
+    }
+
+    static void DestroySingletonEntity<T>(EntityManager entityManager) where T : unmanaged, IComponentData
+    {
+        var query = entityManager.CreateEntityQuery(typeof(T));
+        if (query.CalculateEntityCount() > 0)
+        {
+            entityManager.DestroyEntity(query.GetSingletonEntity());
+        }
+    }
+
+    static void RemoveSystemIfExists<T>(World world, ComponentSystemGroup group) where T : unmanaged, ISystem
+    {
+        var system = world.GetExistingSystem<T>();
+        if (system != SystemHandle.Null)
+        {
+            group.RemoveSystemFromUpdateList(system);
+        }
+    }
 }

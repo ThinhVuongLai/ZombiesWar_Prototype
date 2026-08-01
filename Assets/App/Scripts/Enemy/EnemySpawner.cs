@@ -1,7 +1,9 @@
+using System;
 using App.Combat.Attack;
 using App.Core;
 using App.Core.Services;
 using App.Enemy.Weapon;
+using MagicTile.Pool;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -26,12 +28,16 @@ namespace App.Enemy
             var enemyInfor = configManager.EnemyConfig?.GetEnemyInfor(enemyId);
             if (enemyInfor?.EnemyPrefab == null) return null;
 
-            var enemyInstance = Instantiate(enemyInfor.EnemyPrefab, position, Quaternion.identity);
+            var poolService = ServiceLocator.Resolve<PoolService>();
+            var enemyInstance = poolService.Get(enemyInfor.EnemyPrefab);
+            enemyInstance.transform.position = position;
+            enemyInstance.transform.rotation = Quaternion.identity;
+
             var enemyView = enemyInstance.GetComponent<EnemyView>();
 
             if (enemyView == null)
             {
-                Destroy(enemyInstance);
+                poolService.Release(enemyInstance);
                 return null;
             }
 
@@ -57,6 +63,8 @@ namespace App.Enemy
 
             entityManager.SetComponentData(entity, LocalTransform.FromPosition(position));
             presenter.SetEntity(entity);
+
+            enemyView.CurrentPresenter = presenter;
 
             return enemyView;
         }

@@ -3,6 +3,7 @@ using App.Core.Services;
 using App.Enemy;
 using App.Enemy.Wave;
 using App.JoystickInput;
+using App.Level;
 using App.Player;
 using UnityEngine;
 using VContainer;
@@ -23,21 +24,37 @@ namespace App.Core
             new BulletInstaller().Install(builder);
         }
 
-        void Start()
+        private void Update()
         {
-            EnemyECSWorldBootstrap.Initialize();
+            if(Input.GetKeyDown(KeyCode.L))
+            {
+                LoadLevel();
+            }
 
-            var playerTarget = ServiceLocator.Resolve<IPlayerTargetProvider>();
-            var updater = gameObject.AddComponent<PlayerTargetECSUpdater>();
-            updater.Initialize(playerTarget);
-
-            StartCoroutine(CRStartWaves());
+            if(Input.GetKeyDown(KeyCode.S))
+            {
+                StartLevel();
+            }
         }
 
-        private System.Collections.IEnumerator CRStartWaves()
+        private void LoadLevel()
         {
-            yield return null;
-            ServiceLocator.Resolve<WaveSpawnerManager>().StartWaves();
+            var LevelController = ServiceLocator.Resolve<LevelController>();
+
+            if (LevelController == null)
+                return;
+
+            LevelController.LoadLevel(0);
+        }
+
+        private void StartLevel()
+        {
+            var LevelController = ServiceLocator.Resolve<LevelController>();
+
+            if (LevelController == null)
+                return;
+
+            LevelController.StartLevel();
         }
     }
 }

@@ -11,6 +11,8 @@ namespace App.Core.Services
         static volatile bool _initialized;
         static readonly object _lock = new();
 
+        public static bool Initialized => _initialized;
+
         public static void Initialize(IObjectResolver resolver)
         {
             if (resolver == null)

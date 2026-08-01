@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92c9f8bd21b8e74eaa7755ac111c65c, type: 3}
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
-  _moveAnimationLayerIndex: 2
+  _moveAnimationLayerIndex: 0
   _attackAnimationLayerIndex: 1
-  _idleAnimation: Solider_combat_idle
-  _moveAnimation: Solider_combat_run
+  _playerInfor:
+  - _playerId: 0
+    _playerPrefab: {fileID: 6383596169283952416, guid: ac2ef2ec4011a5b41b09aea07b41db6d,
+      type: 3}
+    _idleAnimation: Solider_combat_idle
+    _moveAnimation: Solider_combat_run
+    _deadAnimation: 

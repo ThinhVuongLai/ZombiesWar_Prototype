@@ -67,6 +67,9 @@ namespace App.Enemy.Wave
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
+            if (!ServiceLocator.Initialized)
+                return;
+
             var configManager = ServiceLocator.Resolve<ConfigManager>();
             if (configManager?.WaveSpawnerConfig == null || configManager.WaveSpawnerConfig.Waves == null)
                 return;

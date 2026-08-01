@@ -3,6 +3,7 @@ using App.Enemy;
 using App.Enemy.Weapon;
 using App.Enemy.Wave;
 using App.HealthBar;
+using App.Level;
 using App.Player;
 using UnityEngine;
 using ZombiesWar.Bullet;
@@ -20,6 +21,7 @@ namespace App.Core
         [SerializeField] EnemyWeaponConfigRegistry _enemyWeaponConfigRegistry;
         [SerializeField] WaveSpawnerConfig _waveSpawnerConfig;
         [SerializeField] EnemyConfig _enemyConfig;
+        [SerializeField] LevelConfig _levelConfig;
 
         public PlayerConfig PlayerConfig => _playerConfig;
         public WeaponConfigRegistry WeaponConfigRegistry => _weaponConfigRegistry;
@@ -29,6 +31,7 @@ namespace App.Core
         public EnemyWeaponConfigRegistry EnemyWeaponConfigRegistry => _enemyWeaponConfigRegistry;
         public WaveSpawnerConfig WaveSpawnerConfig => _waveSpawnerConfig;
         public EnemyConfig EnemyConfig => _enemyConfig;
+        public LevelConfig LevelConfig => _levelConfig;
 
         void Awake()
         {

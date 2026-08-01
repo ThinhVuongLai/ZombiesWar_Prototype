@@ -223,8 +223,8 @@ namespace App.Player
             
             var animationName = state switch
             {
-                PlayerStateType.Idle => _playerConfig.IdleAnimation,
-                PlayerStateType.Move => _playerConfig.MoveAnimation,
+                PlayerStateType.Idle => _playerConfig.PlayerInfor[0].IdleAnimation,
+                PlayerStateType.Move => _playerConfig.PlayerInfor[0].MoveAnimation,
                 _ => null,
             };
             

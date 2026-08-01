@@ -60,6 +60,8 @@ namespace App.Enemy
         public Action OnDestroyed { get; set; }
         public Action<float> TakeExternalDamage { get; set; }
 
+        public IDisposable CurrentPresenter { get; set; }
+
         void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
