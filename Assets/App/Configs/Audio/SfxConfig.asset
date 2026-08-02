@@ -9,19 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: b79a151bd64ac4e49946ff8b791a33db, type: 3}
   m_Name: SfxConfig
-  m_EditorClassIdentifier: Assembly-CSharp:App.Audio:SfxConfig
+  m_EditorClassIdentifier: 
   _sfxList:
-  - _sfx: 2
-    _audioClip: {fileID: 8300000, guid: ceb2474913e8b5e40b17213af473d784, type: 3}
-    _volume: 1
-  - _sfx: 3
-    _audioClip: {fileID: 8300000, guid: 168c9a5ac7025814ea9c89e5098a3cad, type: 3}
-    _volume: 1
   - _sfx: 1
     _audioClip: {fileID: 8300000, guid: 1df1429981f76644097c7fd47fc5f239, type: 3}
     _volume: 1
   - _sfx: 4
     _audioClip: {fileID: 8300000, guid: be64544bade297e4d872dd74c66256d2, type: 3}
+    _volume: 1
+  - _sfx: 2
+    _audioClip: {fileID: 8300000, guid: ceb2474913e8b5e40b17213af473d784, type: 3}
+    _volume: 1
+  - _sfx: 3
+    _audioClip: {fileID: 8300000, guid: 168c9a5ac7025814ea9c89e5098a3cad, type: 3}
     _volume: 1
