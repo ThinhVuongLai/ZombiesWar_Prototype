@@ -8,12 +8,14 @@ namespace App.Player
     {
         [SerializeField] int _playerId;
         [SerializeField] GameObject _playerPrefab;
+        [SerializeField] float _health;
         [SerializeField] string _idleAnimation;
         [SerializeField] string _moveAnimation;
         [SerializeField] string _deadAnimation;
 
         public int PlayerId => _playerId;
         public GameObject PlayerPrefab => _playerPrefab;
+        public float Health => _health;
         public string IdleAnimation => _idleAnimation;
         public string MoveAnimation => _moveAnimation;
         public string DeadAnimation => _deadAnimation;

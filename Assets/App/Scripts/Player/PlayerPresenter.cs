@@ -85,6 +85,12 @@ namespace App.Player
 
             _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+            var playerHealth = _playerConfig.PlayerInfor is { Length: > 0 }
+                ? _playerConfig.PlayerInfor[0].Health
+                : 100f;
+            _model.Health.Value = playerHealth;
+            _model.MaximumHealth.Value = playerHealth;
+
             _states = new Dictionary<PlayerStateType, IPlayerState>
             {
                 [PlayerStateType.Idle] = new PlayerStateIdle(),

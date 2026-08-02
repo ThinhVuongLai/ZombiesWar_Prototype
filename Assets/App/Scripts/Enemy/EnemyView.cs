@@ -13,20 +13,18 @@ namespace App.Enemy
     public struct EnemyViewConfig
     {
         public readonly float MoveSpeed;
-        public readonly float Health;
         public readonly float DetectionRange;
         public readonly string IdleAnimationName;
         public readonly string MoveAnimationName;
         public readonly string AttackAnimationName;
         public readonly string DeadAnimationName;
 
-        public EnemyViewConfig(float moveSpeed, float health,
+        public EnemyViewConfig(float moveSpeed,
             float detectionRange,
             string idleAnimationName = null, string moveAnimationName = null,
             string attackAnimationName = null, string deadAnimationName = null)
         {
             MoveSpeed = moveSpeed;
-            Health = health;
             DetectionRange = detectionRange;
             IdleAnimationName = idleAnimationName;
             MoveAnimationName = moveAnimationName;
@@ -40,7 +38,6 @@ namespace App.Enemy
     {
         [Header("Stats")]
         [SerializeField] float _moveSpeed = 3.5f;
-        [SerializeField] float _health = 100f;
         [SerializeField] float _detectionRange = 12f;
 
         [Header("Animation")]
@@ -68,7 +65,7 @@ namespace App.Enemy
         void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
-            _config = new EnemyViewConfig(_moveSpeed, _health, _detectionRange);
+            _config = new EnemyViewConfig(_moveSpeed, _detectionRange);
             _meshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
 
             if (_meshRenderers is { Length: > 0 })

@@ -92,9 +92,12 @@ namespace App.Level
                 }
             }
 
-            EnemyECSWorldBootstrap.Initialize();
-
             var playerInforList = _playerConfig.PlayerInfor;
+            var playerHealth = playerInforList != null && playerInforList.Length > 0
+                ? playerInforList[0].Health
+                : 100f;
+
+            EnemyECSWorldBootstrap.Initialize(playerHealth);
             if (playerInforList != null && playerInforList.Length > 0 && playerInforList[0].PlayerPrefab != null)
             {
                 _playerInstance = Instantiate(playerInforList[0].PlayerPrefab, Vector3.zero, Quaternion.identity);

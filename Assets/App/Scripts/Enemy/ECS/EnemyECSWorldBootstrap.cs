@@ -7,7 +7,7 @@ public static class EnemyECSWorldBootstrap
 {
     static bool _initialized;
 
-    public static void Initialize()
+    public static void Initialize(float playerHealth = 100f)
     {
         if (_initialized) return;
         _initialized = true;
@@ -25,8 +25,8 @@ public static class EnemyECSWorldBootstrap
         var playerHealthEntity = entityManager.CreateEntity(typeof(PlayerHealth), typeof(LocalTransform));
         entityManager.SetComponentData(playerHealthEntity, new PlayerHealth
         {
-            Value = 100f,
-            MaxValue = 100f,
+            Value = playerHealth,
+            MaxValue = playerHealth,
         });
         entityManager.SetComponentData(playerHealthEntity, LocalTransform.FromPosition(Unity.Mathematics.float3.zero));
 

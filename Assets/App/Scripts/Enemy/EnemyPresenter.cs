@@ -61,7 +61,7 @@ namespace App.Enemy
 
         public EnemyPresenter(IEnemyView view, in EnemyViewConfig config,
             EnemyWeaponConfig weaponConfig, AttackStrategyRegistry registry,
-            IPlayerTargetProvider playerTarget, float dissolveDuration = 1.5f)
+            IPlayerTargetProvider playerTarget, float health, float dissolveDuration = 1.5f)
         {
             _view = view;
             _playerTarget = playerTarget;
@@ -80,9 +80,9 @@ namespace App.Enemy
             AttackRange = weaponConfig?.AttackRange ?? 2f;
 
             _model.MoveSpeed.Value = config.MoveSpeed;
-            _model.Health.Value = config.Health;
-            _model.MaximumHealth.Value = config.Health;
-            _previousHealth = config.Health;
+            _model.Health.Value = health;
+            _model.MaximumHealth.Value = health;
+            _previousHealth = health;
             _model.AttackDamage.Value = AttackDamage;
             _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
@@ -103,7 +103,7 @@ namespace App.Enemy
             var healthBarView = _view.CreateHealthBar();
             if (healthBarView != null)
             {
-                _healthBarPresenter = new HealthBarPresenter(healthBarView, _model.Health, config.Health);
+                _healthBarPresenter = new HealthBarPresenter(healthBarView, _model.Health, health);
             }
 
             Observable.EveryUpdate(UnityFrameProvider.PostLateUpdate)

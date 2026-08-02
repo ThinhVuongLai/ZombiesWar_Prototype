@@ -72,12 +72,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e59491fe59864344fa02052a88c2b171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerConfig: {fileID: 11400000, guid: cb37dba1b871b26429b359c9545e9b80, type: 2}
-  _weaponConfigRegistry: {fileID: 11400000, guid: b1055a89ea1ed33448eb5279c59f12a7,
-    type: 2}
-  _bulletConfigRegistry: {fileID: 11400000, guid: 93039c68032e234469e01725e127ab78,
-    type: 2}
-  _healthBarConfig: {fileID: 11400000, guid: f8a1276c3dc76c64baa84ca070d38d9f, type: 2}
   _animator: {fileID: 922850681635409580}
 --- !u!1 &6765245732309977149
 GameObject:
@@ -103,14 +97,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6765245732309977149}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.30070576, z: 0, w: 0.953717}
+  m_LocalRotation: {x: 0, y: -0.13052624, z: 0, w: 0.9914449}
   m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6248998831433893846}
   m_Father: {fileID: 473617163730971073}
-  m_LocalEulerAnglesHint: {x: 0, y: -35, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -15, z: 0}
 --- !u!1 &7632702299018813395
 GameObject:
   m_ObjectHideFlags: 0

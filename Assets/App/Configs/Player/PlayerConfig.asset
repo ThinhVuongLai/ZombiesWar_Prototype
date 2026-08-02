@@ -18,6 +18,7 @@ MonoBehaviour:
   - _playerId: 0
     _playerPrefab: {fileID: 6383596169283952416, guid: ac2ef2ec4011a5b41b09aea07b41db6d,
       type: 3}
+    _health: 100
     _idleAnimation: Solider_combat_idle
     _moveAnimation: Solider_combat_run
     _deadAnimation: 

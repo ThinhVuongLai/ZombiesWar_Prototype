@@ -39,14 +39,14 @@ namespace App.Enemy
 
             var viewConfig = enemyView.Config;
             var config = new EnemyViewConfig(viewConfig.MoveSpeed,
-                viewConfig.Health, viewConfig.DetectionRange,
+                viewConfig.DetectionRange,
                 enemyInfor.IdleAnimationName, enemyInfor.MoveAnimationName,
                 enemyInfor.AttackAnimationName, enemyInfor.DeadAnimationName);
             enemyView.SetConfig(config);
 
             var presenter = new EnemyPresenter(enemyView, config,
                 weaponConfig, registry, playerTarget,
-                enemyInfor.DissolveDuration);
+                enemyInfor.Health, enemyInfor.DissolveDuration);
 
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entity = entityManager.CreateEntity(
