@@ -9,4 +9,9 @@ namespace App.Player
             StateType = stateType;
         }
     }
+
+    public struct PlayerSetWeaponMessage
+    {
+        public int weaponId;
+    }
 }

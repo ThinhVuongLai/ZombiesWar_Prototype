@@ -130,7 +130,13 @@ namespace App.Player
                     _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
             }).AddTo(_disposables);
 
-            SetWeapon(1);
+            _eventBus.On<PlayerSetWeaponMessage>()
+            .Subscribe(weaponData =>
+            {
+                SetWeapon(weaponData.weaponId);
+            });
+
+            SetWeapon(0);
         }
 
         void OnUpdate()
@@ -162,7 +168,7 @@ namespace App.Player
 
             _eventBus.Publish(new PlayerStateUpdatedMessage(_model.CurrentState.Value));
 
-            if(UnityEngine.Input.GetKeyDown(KeyCode.Q))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Q))
             {
                 PlayAttackAnimation();
             }
@@ -171,13 +177,13 @@ namespace App.Player
         void OnLateUpdate()
         {
             ResolveECSReferences();
-            
+
             bool hadTarget = _hadCombatTarget;
             _hadCombatTarget = HasCombatTarget;
-            
+
             SyncCombatTarget();
             SyncPlayerHealth();
-            
+
             if (!hadTarget && HasCombatTarget)
             {
                 PlayAttackAnimation();
@@ -246,21 +252,21 @@ namespace App.Player
             _currentState = _states[newState];
             _model.CurrentState.Value = newState;
             _currentState.Enter(this);
-            
+
             PlayStateAnimation(newState);
         }
-        
+
         void PlayStateAnimation(PlayerStateType state)
         {
             if (_playerConfig == null) return;
-            
+
             var animationName = state switch
             {
                 PlayerStateType.Idle => _playerConfig.PlayerInfor[0].IdleAnimation,
                 PlayerStateType.Move => _playerConfig.PlayerInfor[0].MoveAnimation,
                 _ => null,
             };
-            
+
             if (!string.IsNullOrEmpty(animationName))
             {
                 _view.PlayMoveAnimation(animationName, _playerConfig.MoveAnimationLayerIndex);
@@ -309,7 +315,7 @@ namespace App.Player
             UpdateWeaponECSRadius(weaponConfig.AttackRange);
 
             AttackStrategyRegistry.RegisterFromConfig(_attackRegistry, weaponConfig, _bulletConfigRegistry);
-            
+
             PlayAttackIdleAnimation();
             _currentWeaponItem = _view.SetWeaponModel(weaponConfig);
         }
@@ -340,7 +346,7 @@ namespace App.Player
                 _view.PlayAttackAnimation(animationName, _playerConfig.AttackAnimationLayerIndex);
             }
         }
-        
+
         void PlayAttackIdleAnimation()
         {
             if (_playerConfig == null || _currentWeaponConfig == null) return;

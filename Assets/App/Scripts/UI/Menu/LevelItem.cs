@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ namespace App.UI
     public class LevelItem : MonoBehaviour
     {
         [SerializeField] private Button _button;
+        [SerializeField] private TextMeshProUGUI _levelNameText;
 
         public int LevelId { get; private set; }
         public Action<int> ClickAction;
@@ -19,6 +21,8 @@ namespace App.UI
         public void Init(int levelId)
         {
             LevelId = levelId;
+
+            _levelNameText.SetText($"Level {levelId + 1}");
         }
     }
 }

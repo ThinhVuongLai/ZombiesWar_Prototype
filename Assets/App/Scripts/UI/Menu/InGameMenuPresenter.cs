@@ -4,6 +4,7 @@ using App.Core.EventBus;
 using App.Core.Services;
 using App.Enemy.Wave;
 using App.Level;
+using App.Player;
 using R3;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace App.UI
         private float _rocketCooldown = 0;
         private float _lastUseTime;
         private bool _inUseRocket = false;
+
+        private byte _cuttentWeaponId = 0;
 
         public InGameMenuPresenter(InGameMenuView view)
         {
@@ -48,10 +51,13 @@ namespace App.UI
             _view.ClickBackToMainAction = OnClickBackToMain;
             _view.ClickUseRocketBoosterAction = OnClickUseRocketBooster;
             _view.ClickChangeWeaponAction = OnClickChangeWeapon;
+            _view.ClickStartLevelAction = OnClickStartLevel;
 
             _view.SetShowRocketFill(false);
             _inUseRocket = false;
             _lastUseTime = 0;
+
+            _view.SetShowStartLevelObject(true);
 
             _eventBus.On<EnemyDefeatedMessage>()
                 .Subscribe(_ =>
@@ -69,6 +75,8 @@ namespace App.UI
                 _view.SetShowRocketFill(false);
                 _inUseRocket = false;
                 _lastUseTime = 0;
+
+                _view.SetShowStartLevelObject(true);
 
                 UpdateRemainingText();
             })
@@ -100,6 +108,7 @@ namespace App.UI
             _view.ClickBackToMainAction = null;
             _view.ClickUseRocketBoosterAction = null;
             _view.ClickChangeWeaponAction = null;
+            _view.ClickStartLevelAction = null;
             _disposables?.Dispose();
         }
 
@@ -123,6 +132,27 @@ namespace App.UI
 
         private void OnClickChangeWeapon()
         {
+            if (_cuttentWeaponId == 0)
+            {
+                _cuttentWeaponId = 1;
+            }
+            else
+            {
+                _cuttentWeaponId = 0;
+
+            }
+
+            _eventBus.Publish<PlayerSetWeaponMessage>(new PlayerSetWeaponMessage()
+            {
+                weaponId = _cuttentWeaponId,
+            });
+        }
+
+        private void OnClickStartLevel()
+        {
+            _view.SetShowStartLevelObject(false);
+
+            ServiceLocator.Resolve<LevelController>()?.StartLevel();
         }
     }
 }

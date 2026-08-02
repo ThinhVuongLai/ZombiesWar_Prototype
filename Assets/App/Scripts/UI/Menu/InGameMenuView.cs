@@ -15,15 +15,21 @@ namespace App.UI
         [Header("For Rocket")]
         [SerializeField] private Image _fillRocketImage;
 
+        [Header("Start Level Object")]
+        [SerializeField] private GameObject _startLevelObject;
+        [SerializeField] private Button _startLevelButton;
+
         public Action ClickBackToMainAction;
         public Action ClickUseRocketBoosterAction;
         public Action ClickChangeWeaponAction;
+        public Action ClickStartLevelAction;
 
         private void Awake()
         {
             _backToMainButton.onClick.AddListener(() => ClickBackToMainAction?.Invoke());
             _useRocketBoosterButton.onClick.AddListener(() => ClickUseRocketBoosterAction?.Invoke());
             _changeWeaponButton.onClick.AddListener(() => ClickChangeWeaponAction?.Invoke());
+            _startLevelButton.onClick.AddListener(()=>ClickStartLevelAction?.Invoke());
         }
 
         public override ICanvasPresenter FirstSpawn()
@@ -49,6 +55,11 @@ namespace App.UI
             _fillRocketImage.gameObject.SetActive(show);
 
             _useRocketBoosterButton.interactable = !show;
+        }
+
+        public void SetShowStartLevelObject(bool show)
+        {
+            _startLevelObject.SetActive(show);
         }
     }
 }
