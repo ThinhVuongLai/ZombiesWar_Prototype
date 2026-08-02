@@ -23,10 +23,12 @@ namespace App.Level
     public readonly struct LevelCompletedMessage
     {
         public readonly int LevelId;
+        public readonly bool IsPlayerWin;
 
-        public LevelCompletedMessage(int levelId)
+        public LevelCompletedMessage(int levelId, bool isPlayerWin)
         {
             LevelId = levelId;
+            IsPlayerWin = isPlayerWin;
         }
     }
 

@@ -42,12 +42,18 @@ namespace App.Booster
         {
             if (_config == null) return;
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.P)
-                && Time.time - _lastUseTime >= _config.Cooldown)
+            if (UnityEngine.Input.GetKeyDown(KeyCode.P))
             {
-                _lastUseTime = Time.time;
-                SpawnRocket(GetTargetPosition());
+                UseRocket();
             }
+        }
+
+        public void UseRocket()
+        {
+            if (_config == null) return;
+            if (Time.time - _lastUseTime < _config.Cooldown) return;
+            _lastUseTime = Time.time;
+            SpawnRocket(GetTargetPosition());
         }
 
         Vector3 GetTargetPosition()

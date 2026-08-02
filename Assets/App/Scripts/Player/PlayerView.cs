@@ -4,7 +4,6 @@ using App.Core.Services;
 using App.HealthBar;
 using DG.Tweening;
 using UnityEngine;
-using ZombiesWar.Bullet;
 using ZombiesWar.Weapon;
 
 namespace App.Player
@@ -141,7 +140,7 @@ namespace App.Player
             _damageFlashTween = sequence;
         }
 
-        public void SetWeaponModel(WeaponBase weaponConfig)
+        public PlayerWeaponItem SetWeaponModel(WeaponBase weaponConfig)
         {
             if (_currentWeaponModel != null)
             {
@@ -149,7 +148,7 @@ namespace App.Player
                 _currentWeaponModel = null;
             }
 
-            if (weaponConfig?.WeaponPrefab == null) return;
+            if (weaponConfig?.WeaponPrefab == null) return null;
 
             var contain = weaponConfig.WeaponType switch
             {
@@ -158,11 +157,16 @@ namespace App.Player
                 WeaponType.Throwing => _thrownContain,
                 _ => null,
             };
-            if (contain == null) return;
+            if (contain == null) return null;
 
             _currentWeaponModel = Instantiate(weaponConfig.WeaponPrefab, contain);
             _currentWeaponModel.transform.localPosition = Vector3.zero;
             _currentWeaponModel.transform.localEulerAngles = Vector3.zero;
+
+            PlayerWeaponItem weaponItem = _currentWeaponModel.GetComponent<PlayerWeaponItem>();
+            weaponItem?.Init();
+
+            return weaponItem;
         }
 
         void ApplyPropertyBlock()

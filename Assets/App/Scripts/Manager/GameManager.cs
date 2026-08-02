@@ -5,6 +5,7 @@ using App.Enemy.Wave;
 using App.JoystickInput;
 using App.Level;
 using App.Player;
+using App.UI;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -22,6 +23,11 @@ namespace App.Core
             new EnemyInstaller().Install(builder);
             new WaveInstaller().Install(builder);
             new BulletInstaller().Install(builder);
+        }
+
+        private void Start()
+        {
+            ServiceLocator.Resolve<CanvasManager>().Spawn(uiName: UIName.MainMenu);
         }
 
         private void Update()

@@ -42,6 +42,7 @@ namespace App.Player
 
         BulletConfig _currentBulletConfig;
         WeaponBase _currentWeaponConfig;
+        PlayerWeaponItem _currentWeaponItem;
         WeaponType _currentWeaponType;
         float _lastAttackTime;
 
@@ -279,6 +280,7 @@ namespace App.Player
             {
                 _currentBulletConfig = null;
                 _currentWeaponConfig = null;
+                _currentWeaponItem = null;
                 _currentWeaponType = WeaponType.Melee;
                 _view.SetWeaponModel(null);
                 return;
@@ -309,7 +311,7 @@ namespace App.Player
             AttackStrategyRegistry.RegisterFromConfig(_attackRegistry, weaponConfig, _bulletConfigRegistry);
             
             PlayAttackIdleAnimation();
-            _view.SetWeaponModel(weaponConfig);
+            _currentWeaponItem = _view.SetWeaponModel(weaponConfig);
         }
 
         void UpdateWeaponECSRadius(float radius)
@@ -364,6 +366,8 @@ namespace App.Player
 
             _lastAttackTime = Time.time;
 
+            _currentWeaponItem?.ScheduleAttackEffect();
+
             if (_currentWeaponType == WeaponType.Melee && _currentWeaponConfig is MeleeWeaponConfig meleeConfig)
             {
                 _isInAttackDuration = true;
@@ -415,6 +419,7 @@ namespace App.Player
 
         public void Dispose()
         {
+            _currentWeaponItem?.CancelAttackEffect();
             _healthBarPresenter?.Dispose();
             _disposables.Dispose();
         }

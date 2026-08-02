@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace MagicTile.Pool
@@ -47,9 +48,20 @@ namespace MagicTile.Pool
 #endif
             }
 
-            instance.SetActive(true);
-            if (instance.TryGetComponent<IPoolable>(out var poolable))
-                poolable.OnGetFromPool();
+            if (instance.IsDestroyed())
+            {
+                instance = Object.Instantiate(_prefab, _parent);
+#if UNITY_EDITOR
+                instance.name = $"{_prefab.name}_{_index}";
+                _index++;
+#endif
+            }
+            else
+            {
+                instance.SetActive(true);
+                if (instance.TryGetComponent<IPoolable>(out var poolable))
+                    poolable.OnGetFromPool();
+            }
 
             return instance;
         }

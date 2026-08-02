@@ -15,6 +15,6 @@ namespace App.Player
         Transform Transform { get; }
         IHealthBarView CreateHealthBar();
         void PlayDamageFlash(Color flashColor, float duration);
-        void SetWeaponModel(WeaponBase weaponConfig);
+        PlayerWeaponItem SetWeaponModel(WeaponBase weaponConfig);
     }
 }

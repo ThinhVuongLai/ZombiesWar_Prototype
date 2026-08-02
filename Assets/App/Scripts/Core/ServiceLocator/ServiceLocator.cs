@@ -36,6 +36,11 @@ namespace App.Core.Services
             _manualRegistry[typeof(T)] = instance;
         }
 
+        public static void Unregister<T>()
+        {
+            _manualRegistry.TryRemove(typeof(T), out _);
+        }
+
         public static T Resolve<T>()
         {
             if (_manualRegistry.TryGetValue(typeof(T), out var manualInstance))

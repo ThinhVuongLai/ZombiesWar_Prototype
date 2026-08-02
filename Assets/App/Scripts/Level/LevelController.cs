@@ -7,6 +7,7 @@ using App.Core.Services;
 using App.Enemy;
 using App.Enemy.Wave;
 using App.Player;
+using App.UI;
 using MagicTile.Pool;
 using R3;
 using UnityEngine;
@@ -104,7 +105,10 @@ namespace App.Level
                 _targetUpdater = gameObject.AddComponent<PlayerTargetECSUpdater>();
                 var targetProvider = _playerInstance.GetComponent<IPlayerTargetProvider>();
                 if (targetProvider != null)
+                {
+                    ServiceLocator.Register<IPlayerTargetProvider>(targetProvider);
                     _targetUpdater.Initialize(targetProvider);
+                }
 
                 if (_cinemachineVirtualCamera != null)
                     _cinemachineVirtualCamera.Follow = _playerInstance.transform;
@@ -133,7 +137,7 @@ namespace App.Level
 
             _eventBus.On<PlayerStateUpdatedMessage>()
                 .Where(msg => msg.StateType == PlayerStateType.Die)
-                .Subscribe(_ => EndLevel())
+                .Subscribe(_ => EndLevel(isPlayerWin: false))
                 .AddTo(_levelDisposables);
 
             _eventBus.Publish(new LevelStartedMessage(_currentLevelId));
@@ -184,21 +188,30 @@ namespace App.Level
         {
             _totalEnemiesAlive = Mathf.Max(0, _totalEnemiesAlive - 1);
             if (_totalEnemiesAlive <= 0 && _allWavesSpawned)
-                EndLevel();
+                EndLevel(isPlayerWin: true);
         }
 
-        public void EndLevel()
+        public void EndLevel(bool isPlayerWin)
         {
             if (_state != LevelState.Playing && _state != LevelState.Loaded) return;
 
             _state = LevelState.Ended;
             _waveDisposables?.Dispose();
             _levelDisposables?.Dispose();
-            _eventBus.Publish(new LevelCompletedMessage(_currentLevelId));
+            _eventBus.Publish(new LevelCompletedMessage(_currentLevelId, isPlayerWin));
+
+            var canvasManager = ServiceLocator.Resolve<CanvasManager>();
+            if (isPlayerWin)
+                canvasManager.Spawn(UIName.WinPopup);
+            else
+                canvasManager.Spawn(UIName.LosePopup);
         }
 
         public void ClearLevel()
         {
+            var canvasManager = ServiceLocator.Resolve<CanvasManager>();
+            canvasManager.Hide(UIName.InGameMenu);
+
             foreach (var enemyView in _spawnedEnemies)
             {
                 if (enemyView == null) continue;
@@ -213,6 +226,7 @@ namespace App.Level
             {
                 if (_cinemachineVirtualCamera != null)
                     _cinemachineVirtualCamera.Follow = null;
+                ServiceLocator.Unregister<IPlayerTargetProvider>();
                 Destroy(_playerInstance);
                 _playerInstance = null;
             }
