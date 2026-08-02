@@ -18,7 +18,7 @@ namespace App.UI
         {
             _disposables = new CompositeDisposable();
 
-            Observable.Timer(TimeSpan.FromSeconds(2f))
+            Observable.Timer(TimeSpan.FromSeconds(1f))
                 .Subscribe(_ =>
                 {
                     ServiceLocator.Resolve<CanvasManager>().Hide(UIName.LoadingPopup);

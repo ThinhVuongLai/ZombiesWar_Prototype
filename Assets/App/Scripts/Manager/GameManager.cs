@@ -28,16 +28,18 @@ namespace App.Core
         private void Start()
         {
             ServiceLocator.Resolve<CanvasManager>().Spawn(uiName: UIName.MainMenu);
+
+            Application.targetFrameRate = 60;
         }
 
         private void Update()
         {
-            if(Input.GetKeyDown(KeyCode.L))
+            if (Input.GetKeyDown(KeyCode.L))
             {
                 LoadLevel();
             }
 
-            if(Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.S))
             {
                 StartLevel();
             }
