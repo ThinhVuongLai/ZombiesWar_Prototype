@@ -281,3 +281,4 @@ MonoBehaviour:
   _attackEffectBeginTime: 0
   _attackEffect: {fileID: 480161954988347115}
   _attackParticle: {fileID: 480161954968852361}
+  _sfx: 4

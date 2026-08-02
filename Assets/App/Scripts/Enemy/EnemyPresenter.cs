@@ -15,6 +15,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
+using App.Audio;
 
 namespace App.Enemy
 {
@@ -200,7 +201,12 @@ namespace App.Enemy
                 case EnemyStateType.Idle: _view.PlayAnimation(_idleAnimation); break;
                 case EnemyStateType.Move: _view.PlayAnimation(_moveAnimation); break;
                 case EnemyStateType.Attack: _view.PlayAnimation(_attackAnimation); break;
-                case EnemyStateType.Die: _view.PlayAnimation(_deadAnimation); break;
+                case EnemyStateType.Die:
+                    {
+                        _view.PlayAnimation(_deadAnimation);
+                        ServiceLocator.Resolve<AudioManager>()?.RunSfx(SFX.ZombieDead);
+                    }
+                    break;
             }
 
             _currentState.Enter(this);
@@ -254,6 +260,8 @@ namespace App.Enemy
                 _currentTakeDamageTime = _meleeWeaponConfig.TakeDamageTime;
                 _currentHitZoneSize = _meleeWeaponConfig.HitZoneSize;
                 _view.PlayAnimation(_attackAnimation);
+                ServiceLocator.Resolve<AudioManager>()?.RunSfx(SFX.ZombieAttack);
+
                 return true;
             }
 

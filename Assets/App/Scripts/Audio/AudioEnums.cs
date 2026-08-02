@@ -8,7 +8,9 @@ namespace App.Audio
     public enum SFX
     {
         Rocket,
-        Gun,
-        ZombieAttack
+        ShotGun,
+        ZombieAttack,
+        ZombieDead,
+        AssaultGun,
     }
 }

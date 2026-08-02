@@ -130,7 +130,7 @@ namespace App.Player
                     _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
             }).AddTo(_disposables);
 
-            SetWeapon(0);
+            SetWeapon(1);
         }
 
         void OnUpdate()

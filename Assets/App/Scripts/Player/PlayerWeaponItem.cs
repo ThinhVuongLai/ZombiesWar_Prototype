@@ -1,4 +1,6 @@
 using System;
+using App.Audio;
+using App.Core.Services;
 using R3;
 using UnityEngine;
 
@@ -9,6 +11,7 @@ namespace App.Player
         [SerializeField] private float _attackEffectBeginTime = 0.5f;
         [SerializeField] private GameObject _attackEffect;
         [SerializeField] private ParticleSystem _attackParticle;
+        [SerializeField] private SFX _sfx = SFX.ShotGun;
 
         private IDisposable _effectTimer;
 
@@ -26,7 +29,7 @@ namespace App.Player
 
         public void Init()
         {
-            if(_attackEffect)
+            if (_attackEffect)
             {
                 _attackEffect.SetActive(false);
             }
@@ -47,6 +50,8 @@ namespace App.Player
             {
                 _attackEffect.SetActive(true);
             }
+
+            ServiceLocator.Resolve<AudioManager>()?.RunSfx(_sfx);
         }
 
         public void CancelAttackEffect()

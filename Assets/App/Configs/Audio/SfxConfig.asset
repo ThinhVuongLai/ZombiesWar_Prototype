@@ -13,6 +13,15 @@ MonoBehaviour:
   m_Name: SfxConfig
   m_EditorClassIdentifier: Assembly-CSharp:App.Audio:SfxConfig
   _sfxList:
-  - _sfx: 0
-    _audioClip: {fileID: 0}
+  - _sfx: 2
+    _audioClip: {fileID: 8300000, guid: ceb2474913e8b5e40b17213af473d784, type: 3}
+    _volume: 1
+  - _sfx: 3
+    _audioClip: {fileID: 8300000, guid: 168c9a5ac7025814ea9c89e5098a3cad, type: 3}
+    _volume: 1
+  - _sfx: 1
+    _audioClip: {fileID: 8300000, guid: 1df1429981f76644097c7fd47fc5f239, type: 3}
+    _volume: 1
+  - _sfx: 4
+    _audioClip: {fileID: 8300000, guid: be64544bade297e4d872dd74c66256d2, type: 3}
     _volume: 1
