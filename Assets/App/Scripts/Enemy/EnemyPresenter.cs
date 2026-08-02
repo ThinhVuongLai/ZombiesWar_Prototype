@@ -236,8 +236,6 @@ namespace App.Enemy
                 _isDead = true;
                 ServiceLocator.Resolve<IEventBus>().Publish(new EnemyDefeatedMessage());
                 TransitionTo(EnemyStateType.Die);
-
-                UnityEngine.Debug.Log($"Change to Die");
             }
         }
 

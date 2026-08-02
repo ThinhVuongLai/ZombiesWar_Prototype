@@ -19,5 +19,6 @@ MonoBehaviour:
   _spawnHeight: 15
   _fallSpeed: 30
   _cooldown: 10
-  _explosionEffectPrefab: {fileID: 0}
-  _effectDuration: 2
+  _explosionEffectPrefab: {fileID: 1742572614408191589, guid: 7f2e8eb6ecf469f4399decad45ed77a0,
+    type: 3}
+  _effectDuration: 0.5

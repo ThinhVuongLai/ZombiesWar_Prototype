@@ -75,6 +75,7 @@ namespace App.Booster
             if (_effectPrefab != null && _poolService != null)
             {
                 var effect = _poolService.Get(_effectPrefab);
+
                 if (effect.TryGetComponent<ExplosionEffect>(out var explosionEffect))
                 {
                     explosionEffect.Play(transform.position, _effectDuration);
