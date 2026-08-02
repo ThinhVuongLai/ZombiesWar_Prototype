@@ -39,6 +39,7 @@ namespace App.Enemy
         [Header("Stats")]
         [SerializeField] float _moveSpeed = 3.5f;
         [SerializeField] float _detectionRange = 12f;
+        [SerializeField] Vector3 _healthBarOffset = Vector3.zero;
 
         [Header("Animation")]
         [SerializeField] Animator _animator;
@@ -134,7 +135,10 @@ namespace App.Enemy
             var healthBarObject = new GameObject("HealthBar");
             healthBarObject.transform.SetParent(transform, false);
             var view = healthBarObject.AddComponent<HealthBarView>();
-            view.Initialize(configManager.EnemyHealthBarConfig, transform);
+
+            Vector3 healthBarOffset = configManager.EnemyHealthBarConfig.Offset + _healthBarOffset;
+
+            view.Initialize(configManager.EnemyHealthBarConfig, transform, overrideOffset: healthBarOffset);
             return view;
         }
 

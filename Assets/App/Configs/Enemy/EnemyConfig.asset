@@ -23,3 +23,13 @@ MonoBehaviour:
     AttackAnimationName: Zombie_1_Attack
     DeadAnimationName: Zombie_1_Death
     DissolveDuration: 1.5
+  - EnemyId: 1
+    EnemyPrefab: {fileID: 3435127961950633917, guid: eea4e42e01e768245a45e19a384169e1,
+      type: 3}
+    WeaponId: 1
+    Health: 100
+    IdleAnimationName: Zombie_1_Idle
+    MoveAnimationName: Zombie_1_Walk
+    AttackAnimationName: Zombie_1_Attack
+    DeadAnimationName: Zombie_1_Death
+    DissolveDuration: 1.5

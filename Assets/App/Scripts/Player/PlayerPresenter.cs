@@ -264,6 +264,7 @@ namespace App.Player
             {
                 PlayerStateType.Idle => _playerConfig.PlayerInfor[0].IdleAnimation,
                 PlayerStateType.Move => _playerConfig.PlayerInfor[0].MoveAnimation,
+                PlayerStateType.Die => _playerConfig.PlayerInfor[0].DeadAnimation,
                 _ => null,
             };
 

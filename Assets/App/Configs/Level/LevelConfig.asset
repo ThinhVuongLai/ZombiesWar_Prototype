@@ -42,11 +42,11 @@ MonoBehaviour:
     _sceneName: Level 1
   - _levelId: 1
     _waveEntries:
-    - EnemyId: 0
+    - EnemyId: 1
       EnemyCount: 5
       SpawnRadius: 30
       IntervalBeforeNext: 10
-    - EnemyId: 0
+    - EnemyId: 1
       EnemyCount: 10
       SpawnRadius: 30
       IntervalBeforeNext: 10
@@ -54,8 +54,8 @@ MonoBehaviour:
       EnemyCount: 15
       SpawnRadius: 50
       IntervalBeforeNext: 10
-    - EnemyId: 0
-      EnemyCount: 20
+    - EnemyId: 1
+      EnemyCount: 15
       SpawnRadius: 50
       IntervalBeforeNext: 10
     - EnemyId: 0

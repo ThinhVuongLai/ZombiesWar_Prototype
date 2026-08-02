@@ -21,4 +21,4 @@ MonoBehaviour:
     _health: 50
     _idleAnimation: Solider_combat_idle
     _moveAnimation: Solider_combat_run
-    _deadAnimation: 
+    _deadAnimation: Solider_combat_Death

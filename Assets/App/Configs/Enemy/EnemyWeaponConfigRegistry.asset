@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _configs:
   - rid: 886955830288842776
+  - rid: 1564660071560118274
   references:
     version: 2
     RefIds:
@@ -28,3 +29,14 @@ MonoBehaviour:
         _attackDuration: 1
         _takeDamageTime: 0.2
         _hitZoneSize: {x: 1, y: 1.5}
+    - rid: 1564660071560118274
+      type: {class: EnemyMeleeWeaponConfig, ns: App.Enemy.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponId: 1
+        _weaponType: 0
+        _damage: 20
+        _attackRange: 1.8
+        _attackCooldown: 1.5
+        _attackDuration: 0.5
+        _takeDamageTime: 0.2
+        _hitZoneSize: {x: 1.5, y: 2}
