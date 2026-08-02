@@ -13,5 +13,6 @@ namespace App.Player
         bool IsGrounded { get; }
         Transform Transform { get; }
         IHealthBarView CreateHealthBar();
+        void PlayDamageFlash(Color flashColor, float duration);
     }
 }

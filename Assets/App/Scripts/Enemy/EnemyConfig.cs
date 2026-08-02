@@ -15,6 +15,9 @@ namespace App.Enemy
         public string MoveAnimationName;
         public string AttackAnimationName;
         public string DeadAnimationName;
+
+        [Header("Effects")]
+        public float DissolveDuration = 1.5f;
     }
 
     [CreateAssetMenu(fileName = "EnemyConfig", menuName = "ZombiesWar/Enemy Config")]

@@ -2,6 +2,7 @@ using System;
 using App.Core;
 using App.Core.Services;
 using App.HealthBar;
+using DG.Tweening;
 using UnityEngine;
 using ZombiesWar.Bullet;
 using ZombiesWar.Weapon;
@@ -15,6 +16,11 @@ namespace App.Player
 
         CharacterController _characterController;
         PlayerPresenter _presenter;
+        SkinnedMeshRenderer[] _meshRenderers;
+        MaterialPropertyBlock _materialPropertyBlock;
+        Tween _damageFlashTween;
+        Color _originalBaseColor;
+        string _colorPropertyName = "_BaseColor";
 
         public bool IsGrounded => _characterController.isGrounded;
         public Transform Transform => transform;
@@ -25,6 +31,26 @@ namespace App.Player
         void Start()
         {
             _characterController = GetComponent<CharacterController>();
+            _meshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+
+            if (_meshRenderers is { Length: > 0 })
+            {
+                var sharedMaterial = _meshRenderers[0].sharedMaterial;
+                if (sharedMaterial != null)
+                {
+                    _colorPropertyName = sharedMaterial.HasProperty("_BaseColor") ? "_BaseColor" : "_Color";
+                    _originalBaseColor = sharedMaterial.GetColor(_colorPropertyName);
+                }
+                else
+                {
+                    _originalBaseColor = Color.white;
+                }
+            }
+            else
+            {
+                _originalBaseColor = Color.white;
+            }
+
             var configManager = ServiceLocator.Resolve<ConfigManager>();
             var input = ServiceLocator.Resolve<IPlayerInputProvider>();
             var eventBus = ServiceLocator.Resolve<Core.EventBus.IEventBus>();
@@ -70,6 +96,52 @@ namespace App.Player
             var view = healthBarObject.AddComponent<HealthBarView>();
             view.Initialize(configManager.HealthBarConfig, transform);
             return view;
+        }
+
+        public void PlayDamageFlash(Color flashColor, float duration)
+        {
+            if (_meshRenderers is not { Length: > 0 }) return;
+
+            if (_materialPropertyBlock == null)
+                _materialPropertyBlock = new MaterialPropertyBlock();
+
+            _damageFlashTween?.Kill();
+
+            var currentColor = _originalBaseColor;
+            var halfDuration = duration * 0.5f;
+
+            var sequence = DOTween.Sequence();
+
+            sequence.Append(DOTween.To(
+                () => currentColor,
+                value =>
+                {
+                    currentColor = value;
+                    _materialPropertyBlock.SetColor(_colorPropertyName, value);
+                    ApplyPropertyBlock();
+                },
+                flashColor,
+                halfDuration));
+
+            sequence.Append(DOTween.To(
+                () => currentColor,
+                value =>
+                {
+                    currentColor = value;
+                    _materialPropertyBlock.SetColor(_colorPropertyName, value);
+                    ApplyPropertyBlock();
+                },
+                _originalBaseColor,
+                halfDuration));
+
+            _damageFlashTween = sequence;
+        }
+
+        void ApplyPropertyBlock()
+        {
+            if (_materialPropertyBlock == null) return;
+            for (int i = 0; i < _meshRenderers.Length; i++)
+                _meshRenderers[i].SetPropertyBlock(_materialPropertyBlock);
         }
     }
 }

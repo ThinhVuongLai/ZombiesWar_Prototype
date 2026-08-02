@@ -58,8 +58,7 @@ namespace App.Enemy
             _moveAnimation = config.MoveAnimationName;
             _attackAnimation = config.AttackAnimationName;
             _deadAnimation = config.DeadAnimationName;
-
-            var weaponConfig = enemyWeaponRegistry?.GetConfig(config.AttackType);
+            _dissolveDuration = dissolveDuration;
 
             _model = new EnemyModel();
             AttackDamage = weaponConfig?.Damage ?? 10f;
@@ -154,8 +153,17 @@ namespace App.Enemy
                 var health = _entityManager.GetComponentData<EnemyHealth>(_entity);
                 _model.Health.Value = health.Value;
 
+                if (health.Value < _previousHealth)
+                {
+                    var globalData = ServiceLocator.Resolve<ConfigManager>().GlobalData;
+                    if (globalData != null)
+                        _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
+                }
+                _previousHealth = health.Value;
+
                 if (health.Value <= 0f && _model.CurrentState.Value != EnemyStateType.Die)
                 {
+                    _isDead = true;
                     TransitionTo(EnemyStateType.Die);
                     return;
                 }
@@ -179,6 +187,9 @@ namespace App.Enemy
             }
 
             _currentState.Enter(this);
+
+            if (newState == EnemyStateType.Die)
+                StartDissolveEffect();
         }
 
         public void TakeDamage(float damage)
@@ -189,6 +200,10 @@ namespace App.Enemy
             var health = _entityManager.GetComponentData<EnemyHealth>(_entity);
             health.Value -= damage;
             _entityManager.SetComponentData(_entity, health);
+
+            var globalData = ServiceLocator.Resolve<ConfigManager>().GlobalData;
+            if (globalData != null)
+                _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
 
             UnityEngine.Debug.Log($"Enemy Get Damage, {health}");
 
@@ -213,15 +228,69 @@ namespace App.Enemy
             return true;
         }
 
+        void ApplyMeleeDamage()
+        {
+            if (_isDead) return;
+
+            var attackerPosition = _view.Transform.position;
+            var attackerForward = _view.Transform.forward;
+            var targetPosition = _playerTarget.PlayerTransform.position;
+
+            if (!MeleeAttackStrategy.IsTargetInHitZone(attackerPosition, attackerForward, targetPosition, _currentHitZoneSize))
+                return;
+
+            var healthAccessor = new PlayerHealthAccessor();
+            if (!healthAccessor.TryApplyDamage(PlayerTargetECSUpdater.PlayerEntity, AttackDamage))
+            {
+                ServiceLocator.Resolve<IEventBus>()
+                    .Publish(new EnemyDealtDamageMessage(AttackDamage, _weaponConfig.WeaponType));
+            }
+        }
+
+        public void ProcessAttackDuration()
+        {
+            if (!_isInAttackDuration) return;
+
+            _attackTimer += Time.deltaTime;
+            if (!_damageAppliedThisAttack && _attackTimer >= _currentAttackDuration * _currentTakeDamageTime)
+            {
+                ApplyMeleeDamage();
+                _damageAppliedThisAttack = true;
+            }
+            if (_attackTimer >= _currentAttackDuration)
+            {
+                _isInAttackDuration = false;
+            }
+        }
+
         public void DestroyECSCombatState()
         {
             if (_entity != Entity.Null && _entityManager.Exists(_entity))
                 _entityManager.DestroyEntity(_entity);
         }
 
+        void StartDissolveEffect()
+        {
+            float dissolveAmount = 0f;
+            DOTween.To(() => dissolveAmount, value =>
+            {
+                dissolveAmount = value;
+                _view.SetDissolveAmount(value);
+            }, 1f, _dissolveDuration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() =>
+            {
+                var poolService = ServiceLocator.Resolve<PoolService>();
+                var gameObject = (_view as MonoBehaviour)?.gameObject;
+                if (gameObject != null)
+                    poolService.Release(gameObject);
+                Dispose();
+            });
+        }
+
         public void ExecuteAttack()
         {
-            var strategy = _attackRegistry.Get(_attackType);
+            var strategy = _attackRegistry.Get(_weaponConfig.WeaponType);
             if (strategy == null) return;
 
             strategy.Execute(
