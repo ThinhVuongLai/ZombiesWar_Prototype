@@ -9,11 +9,13 @@ namespace App.Enemy.Weapon
     [Serializable]
     public abstract class EnemyWeaponConfig
     {
+        [SerializeField] protected int _weaponId;
         [SerializeField] protected WeaponType _weaponType;
         [SerializeField] protected float _damage = 10f;
         [SerializeField] protected float _attackRange = 2f;
         [SerializeField] protected float _attackCooldown = 1.5f;
 
+        public int WeaponId => _weaponId;
         public WeaponType WeaponType => _weaponType;
         public float Damage => _damage;
         public float AttackRange => _attackRange;
@@ -23,6 +25,13 @@ namespace App.Enemy.Weapon
     [Serializable]
     public class EnemyMeleeWeaponConfig : EnemyWeaponConfig
     {
+        [SerializeField] float _attackDuration = 0.5f;
+        [SerializeField] [Range(0f, 1f)] float _takeDamageTime = 0.5f;
+        [SerializeField] Vector2 _hitZoneSize = new(1.5f, 2f);
+
+        public float AttackDuration => _attackDuration;
+        public float TakeDamageTime => _takeDamageTime;
+        public Vector2 HitZoneSize => _hitZoneSize;
     }
 
     [Serializable]
@@ -61,7 +70,7 @@ namespace App.Enemy.Weapon
         [SerializeReference]
         [SerializeField] EnemyWeaponConfig[] _configs;
 
-        readonly Dictionary<WeaponType, EnemyWeaponConfig> _lookup = new();
+        readonly Dictionary<int, EnemyWeaponConfig> _lookup = new();
 
         void OnEnable()
         {
@@ -70,13 +79,13 @@ namespace App.Enemy.Weapon
             foreach (var config in _configs)
             {
                 if (config != null)
-                    _lookup[config.WeaponType] = config;
+                    _lookup[config.WeaponId] = config;
             }
         }
 
-        public EnemyWeaponConfig GetConfig(WeaponType type)
+        public EnemyWeaponConfig GetConfig(int weaponId)
         {
-            _lookup.TryGetValue(type, out var config);
+            _lookup.TryGetValue(weaponId, out var config);
             return config;
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using App.Combat.Attack;
 using App.Core;
 using App.Core.EventBus;
+using App.Core.Services;
 using App.HealthBar;
 using App.Player.Combat;
 using App.Player.ECS;
@@ -43,6 +44,13 @@ namespace App.Player
         WeaponBase _currentWeaponConfig;
         WeaponType _currentWeaponType;
         float _lastAttackTime;
+
+        float _attackTimer;
+        bool _isInAttackDuration;
+        bool _damageAppliedThisAttack;
+        float _currentAttackDuration;
+        float _currentTakeDamageTime;
+        Vector2 _currentHitZoneSize;
 
         IPlayerState _currentState;
         HealthBarPresenter _healthBarPresenter;
@@ -109,6 +117,10 @@ namespace App.Player
                 var health = _entityManager.GetComponentData<PlayerHealth>(_playerHealthEntity);
                 health.Value = math.max(health.Value - message.Damage, 0f);
                 _entityManager.SetComponentData(_playerHealthEntity, health);
+
+                var globalData = ServiceLocator.Resolve<ConfigManager>().GlobalData;
+                if (globalData != null)
+                    _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
             }).AddTo(_disposables);
 
             SetWeapon(0);
@@ -116,9 +128,23 @@ namespace App.Player
 
         void OnUpdate()
         {
+            if (_isInAttackDuration)
+            {
+                _attackTimer += Time.deltaTime;
+                if (!_damageAppliedThisAttack && _attackTimer >= _currentAttackDuration * _currentTakeDamageTime)
+                {
+                    ApplyMeleeDamage();
+                    _damageAppliedThisAttack = true;
+                }
+                if (_attackTimer >= _currentAttackDuration)
+                {
+                    _isInAttackDuration = false;
+                }
+            }
+
             _currentState?.Update(this);
 
-            if (HasCombatTarget)
+            if (HasCombatTarget && !_isInAttackDuration)
             {
                 PlayerStateType state = _model.CurrentState.Value;
                 if (state == PlayerStateType.Idle || state == PlayerStateType.Move)
@@ -317,6 +343,7 @@ namespace App.Player
 
         public void TryAttack()
         {
+            if (_isInAttackDuration) return;
             if (Time.time - _lastAttackTime < _combatModel.AttackCooldown.Value) return;
             if (!_weaponEntityResolved || _weaponTargetEntity == Entity.Null) return;
 
@@ -326,6 +353,20 @@ namespace App.Player
             var targetEntity = data.CurrentTargetEntity;
             if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity)) return;
             if (!_entityManager.HasComponent<LocalTransform>(targetEntity)) return;
+
+            _lastAttackTime = Time.time;
+
+            if (_currentWeaponType == WeaponType.Melee && _currentWeaponConfig is MeleeWeaponConfig meleeConfig)
+            {
+                _isInAttackDuration = true;
+                _attackTimer = 0f;
+                _damageAppliedThisAttack = false;
+                _currentAttackDuration = meleeConfig.AttackDuration;
+                _currentTakeDamageTime = meleeConfig.TakeDamageTime;
+                _currentHitZoneSize = meleeConfig.HitZoneSize;
+                PlayAttackAnimation();
+                return;
+            }
 
             var targetPosition = (Vector3)_entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
 
@@ -339,9 +380,29 @@ namespace App.Player
                 new EnemyHealthAccessor(),
                 faceTarget: false);
 
-            _lastAttackTime = Time.time;
-            
             PlayAttackAnimation();
+        }
+
+        void ApplyMeleeDamage()
+        {
+            if (!_weaponEntityResolved || _weaponTargetEntity == Entity.Null) return;
+
+            var data = _entityManager.GetComponentData<PlayerWeaponTargetData>(_weaponTargetEntity);
+            if (!data.HasTarget) return;
+
+            var targetEntity = data.CurrentTargetEntity;
+            if (targetEntity == Entity.Null || !_entityManager.Exists(targetEntity)) return;
+            if (!_entityManager.HasComponent<LocalTransform>(targetEntity)) return;
+
+            var targetPosition = (Vector3)_entityManager.GetComponentData<LocalTransform>(targetEntity).Position;
+            var attackerPosition = _view.Transform.position;
+            var attackerForward = _view.Transform.forward;
+
+            if (MeleeAttackStrategy.IsTargetInHitZone(attackerPosition, attackerForward, targetPosition, _currentHitZoneSize))
+            {
+                var healthAccessor = new EnemyHealthAccessor();
+                healthAccessor.TryApplyDamage(targetEntity, _currentWeaponConfig.Damage);
+            }
         }
 
         public void Dispose()

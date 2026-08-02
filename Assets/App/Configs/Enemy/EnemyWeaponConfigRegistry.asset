@@ -20,7 +20,11 @@ MonoBehaviour:
     - rid: 886955830288842776
       type: {class: EnemyMeleeWeaponConfig, ns: App.Enemy.Weapon, asm: Assembly-CSharp}
       data:
+        _weaponId: 0
         _weaponType: 0
         _damage: 10
         _attackRange: 1.2
         _attackCooldown: 0.5
+        _attackDuration: 1
+        _takeDamageTime: 0.5
+        _hitZoneSize: {x: 1, y: 1.5}

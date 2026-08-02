@@ -27,5 +27,21 @@ namespace App.Combat.Attack
             if (direction != Vector3.zero)
                 transform.rotation = Quaternion.LookRotation(direction);
         }
+
+        public static bool IsTargetInHitZone(
+            Vector3 attackerPosition, Vector3 attackerForward,
+            Vector3 targetPosition, Vector2 hitZoneSize)
+        {
+            var toTarget = targetPosition - attackerPosition;
+            toTarget.y = 0f;
+
+            var forwardDistance = Vector3.Dot(toTarget, attackerForward);
+            if (forwardDistance < 0f || forwardDistance > hitZoneSize.y)
+                return false;
+
+            var attackerRight = Vector3.Cross(Vector3.up, attackerForward).normalized;
+            var rightDistance = Mathf.Abs(Vector3.Dot(toTarget, attackerRight));
+            return rightDistance <= hitZoneSize.x * 0.5f;
+        }
     }
 }

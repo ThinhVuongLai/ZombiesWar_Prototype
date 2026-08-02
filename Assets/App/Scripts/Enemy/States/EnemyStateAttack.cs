@@ -13,21 +13,30 @@ namespace App.Enemy.States
 
         public void Update(EnemyPresenter presenter)
         {
+            presenter.ProcessAttackDuration();
+
+            if (presenter.IsInAttackDuration) return;
+
             var detectionState = presenter.CachedDetectionState;
 
-            if (detectionState == EnemyDetectionState.InDetectionRange)
+            switch (detectionState)
             {
-                presenter.TransitionTo(EnemyStateType.Move);
-                return;
+                case EnemyDetectionState.InDetectionRange:
+                    {
+                        presenter.TransitionTo(EnemyStateType.Move);
+                    }
+                    break;
+                case EnemyDetectionState.InAttackRange:
+                    {
+                        presenter.TryAttack(UnityEngine.Time.time);
+                    }
+                    break;
+                default:
+                    {
+                        presenter.TransitionTo(EnemyStateType.Idle);
+                    }
+                    break;
             }
-
-            if (detectionState == EnemyDetectionState.None)
-            {
-                presenter.TransitionTo(EnemyStateType.Idle);
-                return;
-            }
-
-            presenter.TryAttack(UnityEngine.Time.time);
         }
 
         public void Exit(EnemyPresenter presenter) { }

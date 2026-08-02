@@ -10,35 +10,36 @@ namespace App.Combat.Attack
         readonly Dictionary<WeaponType, IAttackStrategy> _strategies = new();
 
         public static AttackStrategyRegistry CreateForEnemy(
-            EnemyWeaponConfigRegistry enemyWeaponRegistry,
+            EnemyWeaponConfig weaponConfig,
             BulletConfigRegistry bulletRegistry)
         {
             var registry = new AttackStrategyRegistry();
-
             registry.Register(WeaponType.Melee, new MeleeAttackStrategy());
+            registry.Register(WeaponType.Range, new RangedAttackStrategy(null, 0f));
+            registry.Register(WeaponType.Throwing, new MeleeAttackStrategy());
 
-            if (enemyWeaponRegistry != null)
-            {
-                var rangedConfig = enemyWeaponRegistry.GetConfig(WeaponType.Range);
-                if (rangedConfig is EnemyRangedWeaponConfig rangedWeapon && bulletRegistry != null)
-                {
-                    var bulletConfig = bulletRegistry.GetConfig(rangedWeapon.BulletId);
-                    registry.Register(WeaponType.Range, new RangedAttackStrategy(bulletConfig, rangedWeapon.Damage));
-                }
-
-                var throwConfig = enemyWeaponRegistry.GetConfig(WeaponType.Throwing);
-                if (throwConfig is EnemyThrowWeaponConfig throwWeapon)
-                {
-                    registry.Register(WeaponType.Throwing, new ThrowAttackStrategy(throwWeapon));
-                }
-            }
-
-            if (!registry._strategies.ContainsKey(WeaponType.Range))
-                registry.Register(WeaponType.Range, new RangedAttackStrategy(null, 0f));
-            if (!registry._strategies.ContainsKey(WeaponType.Throwing))
-                registry.Register(WeaponType.Throwing, new MeleeAttackStrategy());
+            if (weaponConfig != null)
+                RegisterFromEnemyConfig(registry, weaponConfig, bulletRegistry);
 
             return registry;
+        }
+
+        public static void RegisterFromEnemyConfig(AttackStrategyRegistry registry, EnemyWeaponConfig config,
+            BulletConfigRegistry bulletRegistry)
+        {
+            switch (config.WeaponType)
+            {
+                case WeaponType.Range when config is EnemyRangedWeaponConfig rangeConfig:
+                    var bulletConfig = bulletRegistry?.GetConfig(rangeConfig.BulletId);
+                    registry.Replace(WeaponType.Range, new RangedAttackStrategy(bulletConfig, config.Damage));
+                    break;
+                case WeaponType.Throwing when config is EnemyThrowWeaponConfig throwConfig:
+                    registry.Replace(WeaponType.Throwing, new ThrowAttackStrategy(throwConfig));
+                    break;
+                default:
+                    registry.Replace(WeaponType.Melee, new MeleeAttackStrategy());
+                    break;
+            }
         }
 
         public static AttackStrategyRegistry CreateForPlayer(

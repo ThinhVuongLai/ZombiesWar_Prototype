@@ -31,6 +31,8 @@ namespace App.HealthBar
         public void Dispose()
         {
             _disposables.Dispose();
+            if (_view is UnityEngine.MonoBehaviour viewBehaviour)
+                UnityEngine.Object.Destroy(viewBehaviour.gameObject);
         }
     }
 }

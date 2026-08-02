@@ -2,6 +2,8 @@ using System;
 using App.Core;
 using App.Core.Services;
 using App.HealthBar;
+using DG.Tweening;
+using MagicTile.Pool;
 using UnityEngine;
 using UnityEngine.AI;
 using ZombiesWar.ThrowingWeapon;
@@ -10,7 +12,6 @@ namespace App.Enemy
 {
     public struct EnemyViewConfig
     {
-        public readonly WeaponType AttackType;
         public readonly float MoveSpeed;
         public readonly float Health;
         public readonly float DetectionRange;
@@ -19,12 +20,11 @@ namespace App.Enemy
         public readonly string AttackAnimationName;
         public readonly string DeadAnimationName;
 
-        public EnemyViewConfig(WeaponType attackType, float moveSpeed, float health,
+        public EnemyViewConfig(float moveSpeed, float health,
             float detectionRange,
             string idleAnimationName = null, string moveAnimationName = null,
             string attackAnimationName = null, string deadAnimationName = null)
         {
-            AttackType = attackType;
             MoveSpeed = moveSpeed;
             Health = health;
             DetectionRange = detectionRange;
@@ -36,10 +36,8 @@ namespace App.Enemy
     }
 
     [RequireComponent(typeof(NavMeshAgent))]
-    public class EnemyView : MonoBehaviour, IEnemyView, IDamageable
+    public class EnemyView : MonoBehaviour, IEnemyView, IDamageable, IPoolable
     {
-        [SerializeField] WeaponType _attackType = WeaponType.Melee;
-
         [Header("Stats")]
         [SerializeField] float _moveSpeed = 3.5f;
         [SerializeField] float _health = 100f;
@@ -50,6 +48,11 @@ namespace App.Enemy
 
         NavMeshAgent _agent;
         EnemyViewConfig _config;
+        SkinnedMeshRenderer[] _meshRenderers;
+        MaterialPropertyBlock _materialPropertyBlock;
+        Tween _damageFlashTween;
+        Color _originalBaseColor;
+        string _colorPropertyName = "_BaseColor";
 
         public EnemyViewConfig Config => _config;
 
@@ -65,7 +68,26 @@ namespace App.Enemy
         void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
-            _config = new EnemyViewConfig(_attackType, _moveSpeed, _health, _detectionRange);
+            _config = new EnemyViewConfig(_moveSpeed, _health, _detectionRange);
+            _meshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+
+            if (_meshRenderers is { Length: > 0 })
+            {
+                var sharedMaterial = _meshRenderers[0].sharedMaterial;
+                if (sharedMaterial != null)
+                {
+                    _colorPropertyName = sharedMaterial.HasProperty("_BaseColor") ? "_BaseColor" : "_Color";
+                    _originalBaseColor = sharedMaterial.GetColor(_colorPropertyName);
+                }
+                else
+                {
+                    _originalBaseColor = Color.white;
+                }
+            }
+            else
+            {
+                _originalBaseColor = Color.white;
+            }
         }
 
         public void SetConfig(EnemyViewConfig config)
@@ -117,6 +139,75 @@ namespace App.Enemy
             var view = healthBarObject.AddComponent<HealthBarView>();
             view.Initialize(configManager.EnemyHealthBarConfig, transform);
             return view;
+        }
+
+        public void SetDissolveAmount(float amount)
+        {
+            if (_meshRenderers == null) return;
+
+            if (_materialPropertyBlock == null)
+                _materialPropertyBlock = new MaterialPropertyBlock();
+
+            _materialPropertyBlock.SetFloat("_DissolveAmount", amount);
+            ApplyPropertyBlock();
+        }
+
+        public void PlayDamageFlash(Color flashColor, float duration)
+        {
+            if (_meshRenderers is not { Length: > 0 }) return;
+
+            if (_materialPropertyBlock == null)
+                _materialPropertyBlock = new MaterialPropertyBlock();
+
+            _damageFlashTween?.Kill();
+
+            var currentColor = _originalBaseColor;
+            var halfDuration = duration * 0.5f;
+
+            var sequence = DOTween.Sequence();
+
+            sequence.Append(DOTween.To(
+                () => currentColor,
+                value =>
+                {
+                    currentColor = value;
+                    _materialPropertyBlock.SetColor(_colorPropertyName, value);
+                    ApplyPropertyBlock();
+                },
+                flashColor,
+                halfDuration));
+
+            sequence.Append(DOTween.To(
+                () => currentColor,
+                value =>
+                {
+                    currentColor = value;
+                    _materialPropertyBlock.SetColor(_colorPropertyName, value);
+                    ApplyPropertyBlock();
+                },
+                _originalBaseColor,
+                halfDuration));
+
+            _damageFlashTween = sequence;
+
+            _damageFlashTween.Play();
+        }
+
+        void ApplyPropertyBlock()
+        {
+            if (_materialPropertyBlock == null) return;
+            for (int i = 0; i < _meshRenderers.Length; i++)
+                _meshRenderers[i].SetPropertyBlock(_materialPropertyBlock);
+        }
+
+        void IPoolable.OnGetFromPool()
+        {
+            SetDissolveAmount(0f);
+        }
+
+        void IPoolable.OnReleaseToPool()
+        {
+            SetDissolveAmount(0f);
         }
     }
 }

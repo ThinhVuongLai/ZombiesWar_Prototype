@@ -13,15 +13,6 @@ namespace App.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
-        AttackStrategyRegistry _attackStrategyRegistry;
-
-        void Start()
-        {
-            var configManager = ServiceLocator.Resolve<ConfigManager>();
-            _attackStrategyRegistry = AttackStrategyRegistry.CreateForEnemy(
-                configManager.EnemyWeaponConfigRegistry, configManager.BulletConfigRegistry);
-        }
-
         public EnemyView SpawnEnemy(Vector3 position, int enemyId)
         {
             var configManager = ServiceLocator.Resolve<ConfigManager>();
@@ -41,17 +32,21 @@ namespace App.Enemy
                 return null;
             }
 
+            var weaponConfig = configManager.EnemyWeaponConfigRegistry?.GetConfig(enemyInfor.WeaponId);
+            var registry = CreateAttackRegistry(weaponConfig, configManager.BulletConfigRegistry);
+
             var playerTarget = ServiceLocator.Resolve<IPlayerTargetProvider>();
 
             var viewConfig = enemyView.Config;
-            var config = new EnemyViewConfig(viewConfig.AttackType, viewConfig.MoveSpeed,
+            var config = new EnemyViewConfig(viewConfig.MoveSpeed,
                 viewConfig.Health, viewConfig.DetectionRange,
                 enemyInfor.IdleAnimationName, enemyInfor.MoveAnimationName,
                 enemyInfor.AttackAnimationName, enemyInfor.DeadAnimationName);
             enemyView.SetConfig(config);
 
             var presenter = new EnemyPresenter(enemyView, config,
-                _attackStrategyRegistry, configManager.EnemyWeaponConfigRegistry, playerTarget);
+                weaponConfig, registry, playerTarget,
+                enemyInfor.DissolveDuration);
 
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var entity = entityManager.CreateEntity(
@@ -67,6 +62,12 @@ namespace App.Enemy
             enemyView.CurrentPresenter = presenter;
 
             return enemyView;
+        }
+
+        static AttackStrategyRegistry CreateAttackRegistry(EnemyWeaponConfig weaponConfig,
+            BulletConfigRegistry bulletRegistry)
+        {
+            return AttackStrategyRegistry.CreateForEnemy(weaponConfig, bulletRegistry);
         }
     }
 }

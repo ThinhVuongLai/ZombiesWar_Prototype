@@ -9,6 +9,7 @@ namespace App.Enemy
     {
         public int EnemyId;
         public GameObject EnemyPrefab;
+        public int WeaponId;
 
         [Header("Animations")]
         public string IdleAnimationName;

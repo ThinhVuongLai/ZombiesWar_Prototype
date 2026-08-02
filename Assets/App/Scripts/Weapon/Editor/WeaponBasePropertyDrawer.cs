@@ -69,6 +69,11 @@ namespace ZombiesWar.Weapon.Editor
 
             switch (currentType)
             {
+                case WeaponType.Melee:
+                    DrawField(ref verticalPosition, position, property, "_attackDuration", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_takeDamageTime", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_hitZoneSize", lineHeight, spacing);
+                    break;
                 case WeaponType.Range:
                     DrawField(ref verticalPosition, position, property, "_bulletId", lineHeight, spacing);
                     break;
@@ -109,6 +114,10 @@ namespace ZombiesWar.Weapon.Editor
             var oldAttackIdleAnimation = property.FindPropertyRelative("_attackIdleAnimation").stringValue;
             var oldAttackAnimation = property.FindPropertyRelative("_attackAnimation").stringValue;
 
+            var oldAttackDuration = property.FindPropertyRelative("_attackDuration")?.floatValue ?? 0.5f;
+            var oldTakeDamageTime = property.FindPropertyRelative("_takeDamageTime")?.floatValue ?? 0.5f;
+            var oldHitZoneSize = property.FindPropertyRelative("_hitZoneSize")?.vector2Value ?? new Vector2(1.5f, 2f);
+
             WeaponBase newInstance = newType switch
             {
                 WeaponType.Melee => new MeleeWeaponConfig(),
@@ -126,6 +135,13 @@ namespace ZombiesWar.Weapon.Editor
             property.FindPropertyRelative("_attackRange").floatValue = oldRange;
             property.FindPropertyRelative("_attackIdleAnimation").stringValue = oldAttackIdleAnimation;
             property.FindPropertyRelative("_attackAnimation").stringValue = oldAttackAnimation;
+
+            var attackDurationProp = property.FindPropertyRelative("_attackDuration");
+            if (attackDurationProp != null) attackDurationProp.floatValue = oldAttackDuration;
+            var takeDamageTimeProp = property.FindPropertyRelative("_takeDamageTime");
+            if (takeDamageTimeProp != null) takeDamageTimeProp.floatValue = oldTakeDamageTime;
+            var hitZoneSizeProp = property.FindPropertyRelative("_hitZoneSize");
+            if (hitZoneSizeProp != null) hitZoneSizeProp.vector2Value = oldHitZoneSize;
 
             property.serializedObject.ApplyModifiedProperties();
         }
@@ -145,6 +161,7 @@ namespace ZombiesWar.Weapon.Editor
 
             int extraLines = type switch
             {
+                WeaponType.Melee => 3,
                 WeaponType.Range => 1,
                 WeaponType.Throwing => 9,
                 _ => 0,

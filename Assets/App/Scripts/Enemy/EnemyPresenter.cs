@@ -5,14 +5,16 @@ using App.Core;
 using App.Core.EventBus;
 using App.Core.Services;
 using App.Enemy.States;
-using App.Enemy.Weapon;
 using App.Enemy.Wave;
+using App.Enemy.Weapon;
 using App.HealthBar;
+using DG.Tweening;
+using MagicTile.Pool;
 using R3;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
-using System.Diagnostics;
+using UnityEngine;
 
 namespace App.Enemy
 {
@@ -25,7 +27,8 @@ namespace App.Enemy
         readonly CompositeDisposable _disposables = new();
         readonly EntityManager _entityManager;
         readonly AttackStrategyRegistry _attackRegistry;
-        readonly WeaponType _attackType;
+        readonly EnemyWeaponConfig _weaponConfig;
+        readonly EnemyMeleeWeaponConfig _meleeWeaponConfig;
         readonly string _idleAnimation;
         readonly string _moveAnimation;
         readonly string _attackAnimation;
@@ -34,6 +37,9 @@ namespace App.Enemy
         IEnemyState _currentState;
         Entity _entity;
         HealthBarPresenter _healthBarPresenter;
+        bool _isDead;
+        float _dissolveDuration;
+        float _previousHealth;
 
         public IEnemyView View => _view;
         public IPlayerTargetProvider PlayerTarget => _playerTarget;
@@ -42,18 +48,27 @@ namespace App.Enemy
 
         float _lastAttackTime;
 
-        // Cached from ECS (read after SimulationSystemGroup completes, in LateUpdate)
+        float _attackTimer;
+        bool _isInAttackDuration;
+        bool _damageAppliedThisAttack;
+        float _currentAttackDuration;
+        float _currentTakeDamageTime;
+        Vector2 _currentHitZoneSize;
+
+        public bool IsInAttackDuration => _isInAttackDuration;
+
         public EnemyDetectionState CachedDetectionState { get; private set; }
 
         public EnemyPresenter(IEnemyView view, in EnemyViewConfig config,
-            AttackStrategyRegistry registry, EnemyWeaponConfigRegistry enemyWeaponRegistry,
-            IPlayerTargetProvider playerTarget)
+            EnemyWeaponConfig weaponConfig, AttackStrategyRegistry registry,
+            IPlayerTargetProvider playerTarget, float dissolveDuration = 1.5f)
         {
             _view = view;
             _playerTarget = playerTarget;
             _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             _attackRegistry = registry;
-            _attackType = config.AttackType;
+            _weaponConfig = weaponConfig;
+            _meleeWeaponConfig = weaponConfig as EnemyMeleeWeaponConfig;
             _idleAnimation = config.IdleAnimationName;
             _moveAnimation = config.MoveAnimationName;
             _attackAnimation = config.AttackAnimationName;
@@ -67,6 +82,7 @@ namespace App.Enemy
             _model.MoveSpeed.Value = config.MoveSpeed;
             _model.Health.Value = config.Health;
             _model.MaximumHealth.Value = config.Health;
+            _previousHealth = config.Health;
             _model.AttackDamage.Value = AttackDamage;
             _model.AttackCooldown.Value = weaponConfig?.AttackCooldown ?? 1.5f;
             _model.DetectionRange.Value = config.DetectionRange;
@@ -194,6 +210,7 @@ namespace App.Enemy
 
         public void TakeDamage(float damage)
         {
+            if (_isDead) return;
             if (_entity == Entity.Null || !_entityManager.HasComponent<EnemyHealth>(_entity))
                 return;
 
@@ -209,6 +226,7 @@ namespace App.Enemy
 
             if (health.Value <= 0f)
             {
+                _isDead = true;
                 ServiceLocator.Resolve<IEventBus>().Publish(new EnemyDefeatedMessage());
                 TransitionTo(EnemyStateType.Die);
 
@@ -218,11 +236,26 @@ namespace App.Enemy
 
         public bool TryAttack(float currentTime)
         {
+            if (_isInAttackDuration) return false;
+
             var cooldown = _model.AttackCooldown.Value;
             if (currentTime - _lastAttackTime < cooldown)
                 return false;
 
             _lastAttackTime = currentTime;
+
+            if (_weaponConfig.WeaponType == WeaponType.Melee && _meleeWeaponConfig != null)
+            {
+                _isInAttackDuration = true;
+                _attackTimer = 0f;
+                _damageAppliedThisAttack = false;
+                _currentAttackDuration = _meleeWeaponConfig.AttackDuration;
+                _currentTakeDamageTime = _meleeWeaponConfig.TakeDamageTime;
+                _currentHitZoneSize = _meleeWeaponConfig.HitZoneSize;
+                _view.PlayAnimation(_attackAnimation);
+                return true;
+            }
+
             ExecuteAttack();
             _view.PlayAnimation(_attackAnimation);
             return true;
@@ -302,7 +335,7 @@ namespace App.Enemy
                 faceTarget: true,
                 fallbackDamageDealer: damage =>
                     ServiceLocator.Resolve<IEventBus>()
-                        .Publish(new EnemyDealtDamageMessage(damage, _attackType)));
+                        .Publish(new EnemyDealtDamageMessage(damage, _weaponConfig.WeaponType)));
         }
 
         public void Dispose()

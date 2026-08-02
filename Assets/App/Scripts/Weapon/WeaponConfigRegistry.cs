@@ -29,6 +29,13 @@ namespace ZombiesWar.Weapon
     [Serializable]
     public class MeleeWeaponConfig : WeaponBase
     {
+        [SerializeField] float _attackDuration = 0.5f;
+        [SerializeField] [Range(0f, 1f)] float _takeDamageTime = 0.5f;
+        [SerializeField] Vector2 _hitZoneSize = new(1.5f, 2f);
+
+        public float AttackDuration => _attackDuration;
+        public float TakeDamageTime => _takeDamageTime;
+        public Vector2 HitZoneSize => _hitZoneSize;
     }
 
     [Serializable]

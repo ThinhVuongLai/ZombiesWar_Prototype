@@ -16,5 +16,7 @@ namespace App.Enemy
         Action OnDestroyed { get; set; }
         Action<float> TakeExternalDamage { get; set; }
         IHealthBarView CreateHealthBar();
+        void SetDissolveAmount(float amount);
+        void PlayDamageFlash(Color flashColor, float duration);
     }
 }
