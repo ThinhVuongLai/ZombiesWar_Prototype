@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: LV
   productName: ZombiesWar
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -59,9 +59,9 @@ PlayerSettings:
   androidShowActivityIndicatorOnLoading: -1
   iosUseCustomAppBackgroundBehavior: 0
   allowedAutorotateToPortrait: 1
-  allowedAutorotateToPortraitUpsideDown: 1
-  allowedAutorotateToLandscapeRight: 1
-  allowedAutorotateToLandscapeLeft: 1
+  allowedAutorotateToPortraitUpsideDown: 0
+  allowedAutorotateToLandscapeRight: 0
+  allowedAutorotateToLandscapeLeft: 0
   useOSAutorotation: 1
   use32BitDisplayBuffer: 1
   preserveFramebufferAlpha: 0
@@ -141,7 +141,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.1.0
+  bundleVersion: 1.0.0
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -163,7 +163,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.UnityTechnologies.com.unity.template.urpblank
+    Android: com.ThinhVuongCompany.ZombieWar
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
     iPhone: com.Unity-Technologies.com.unity.template.urp-blank
   buildNumber:
@@ -172,7 +172,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 1
+  AndroidBundleVersionCode: 100
   AndroidMinSdkVersion: 22
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
@@ -265,7 +265,7 @@ PlayerSettings:
   useCustomGradlePropertiesTemplate: 0
   useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 0
-  AndroidTargetArchitectures: 1
+  AndroidTargetArchitectures: 3
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
@@ -819,27 +819,28 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: UNITY_MCP_READY
-    EmbeddedLinux: UNITY_MCP_READY
-    GameCoreScarlett: UNITY_MCP_READY
-    GameCoreXboxOne: UNITY_MCP_READY
-    LinuxHeadlessSimulation: UNITY_MCP_READY
-    Nintendo Switch: UNITY_MCP_READY
-    PS4: UNITY_MCP_READY
-    PS5: UNITY_MCP_READY
-    QNX: UNITY_MCP_READY
+    Android: UNITY_MCP_READY;STARTER_ASSETS_PACKAGES_CHECKED;DOTWEEN
+    EmbeddedLinux: UNITY_MCP_READY;DOTWEEN
+    GameCoreScarlett: UNITY_MCP_READY;DOTWEEN
+    GameCoreXboxOne: UNITY_MCP_READY;DOTWEEN
+    LinuxHeadlessSimulation: UNITY_MCP_READY;DOTWEEN
+    Nintendo Switch: UNITY_MCP_READY;DOTWEEN
+    PS4: UNITY_MCP_READY;DOTWEEN
+    PS5: UNITY_MCP_READY;DOTWEEN
+    QNX: UNITY_MCP_READY;DOTWEEN
     Server: UNITY_MCP_READY
-    Stadia: UNITY_MCP_READY
-    Standalone: UNITY_MCP_READY
-    VisionOS: UNITY_MCP_READY
-    WebGL: UNITY_MCP_READY
-    Windows Store Apps: UNITY_MCP_READY
-    XboxOne: UNITY_MCP_READY
-    iPhone: UNITY_MCP_READY
-    tvOS: UNITY_MCP_READY
+    Stadia: UNITY_MCP_READY;DOTWEEN
+    Standalone: UNITY_MCP_READY;DOTWEEN
+    VisionOS: UNITY_MCP_READY;DOTWEEN
+    WebGL: UNITY_MCP_READY;DOTWEEN
+    Windows Store Apps: UNITY_MCP_READY;DOTWEEN
+    XboxOne: UNITY_MCP_READY;DOTWEEN
+    iPhone: UNITY_MCP_READY;DOTWEEN
+    tvOS: UNITY_MCP_READY;DOTWEEN
   additionalCompilerArguments: {}
   platformArchitecture: {}
-  scriptingBackend: {}
+  scriptingBackend:
+    Android: 1
   il2cppCompilerConfiguration: {}
   il2cppCodeGeneration: {}
   managedStrippingLevel:
@@ -943,7 +944,7 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: d94e3a5f-1fee-4519-9c8a-4862f18d86e3
   framebufferDepthMemorylessMode: 0
