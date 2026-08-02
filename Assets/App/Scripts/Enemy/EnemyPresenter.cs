@@ -180,6 +180,7 @@ namespace App.Enemy
                 if (health.Value <= 0f && _model.CurrentState.Value != EnemyStateType.Die)
                 {
                     _isDead = true;
+                    ServiceLocator.Resolve<IEventBus>().Publish(new EnemyDefeatedMessage());
                     TransitionTo(EnemyStateType.Die);
                     return;
                 }

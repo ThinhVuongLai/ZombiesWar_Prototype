@@ -45,6 +45,8 @@ namespace App.Enemy.Weapon.Editor
 
             verticalPosition += lineHeight + spacing;
 
+            DrawField(ref verticalPosition, position, property, "_weaponId", lineHeight, spacing);
+
             var weaponTypeProp = property.FindPropertyRelative("_weaponType");
             var dropdownRect = new Rect(position.x, verticalPosition, width, lineHeight);
             EditorGUI.BeginChangeCheck();
@@ -59,7 +61,6 @@ namespace App.Enemy.Weapon.Editor
 
             verticalPosition += lineHeight + spacing;
 
-            DrawField(ref verticalPosition, position, property, "_weaponId", lineHeight, spacing);
             DrawField(ref verticalPosition, position, property, "_damage", lineHeight, spacing);
             DrawField(ref verticalPosition, position, property, "_attackRange", lineHeight, spacing);
             DrawField(ref verticalPosition, position, property, "_attackCooldown", lineHeight, spacing);
