@@ -16,6 +16,7 @@ namespace App.UI
         private LevelController _levelController;
         private IEventBus _eventBus;
         private BoosterManager _boosterManager;
+        private int _levelEnemyTotal = 0;
 
         public InGameMenuPresenter(InGameMenuView view)
         {
@@ -31,6 +32,8 @@ namespace App.UI
             _boosterManager = ServiceLocator.Resolve<BoosterManager>();
 
             _totalRemaining = parameters.Length > 0 && parameters[0] is int total ? total : 0;
+
+            _levelEnemyTotal = _totalRemaining;
             UpdateRemainingText();
 
             _view.ClickBackToMainAction = OnClickBackToMain;
@@ -44,6 +47,14 @@ namespace App.UI
                     UpdateRemainingText();
                 })
                 .AddTo(_disposables);
+
+            _eventBus.On<ReplayLevelMessage>()
+            .Subscribe(_ =>
+            {
+                _totalRemaining = _levelEnemyTotal;
+                UpdateRemainingText();
+            })
+            .AddTo(_disposables);
         }
 
         public void Hide()

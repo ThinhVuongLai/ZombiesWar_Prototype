@@ -17,22 +17,53 @@ MonoBehaviour:
     _waveEntries:
     - EnemyId: 0
       EnemyCount: 5
-      SpawnRadius: 100
+      SpawnRadius: 30
       IntervalBeforeNext: 10
     - EnemyId: 0
       EnemyCount: 10
-      SpawnRadius: 100
+      SpawnRadius: 30
       IntervalBeforeNext: 10
     - EnemyId: 0
       EnemyCount: 15
-      SpawnRadius: 100
+      SpawnRadius: 50
       IntervalBeforeNext: 10
     - EnemyId: 0
       EnemyCount: 20
-      SpawnRadius: 100
+      SpawnRadius: 50
       IntervalBeforeNext: 10
     - EnemyId: 0
       EnemyCount: 25
-      SpawnRadius: 100
+      SpawnRadius: 50
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 30
+      SpawnRadius: 50
       IntervalBeforeNext: 10
     _sceneName: Level 1
+  - _levelId: 1
+    _waveEntries:
+    - EnemyId: 0
+      EnemyCount: 5
+      SpawnRadius: 30
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 10
+      SpawnRadius: 30
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 15
+      SpawnRadius: 50
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 20
+      SpawnRadius: 50
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 25
+      SpawnRadius: 50
+      IntervalBeforeNext: 10
+    - EnemyId: 0
+      EnemyCount: 30
+      SpawnRadius: 50
+      IntervalBeforeNext: 10
+    _sceneName: Level 2

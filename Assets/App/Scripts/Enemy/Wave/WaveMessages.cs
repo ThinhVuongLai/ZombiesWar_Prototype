@@ -33,4 +33,9 @@ namespace App.Enemy.Wave
     public readonly struct EnemyDefeatedMessage
     {
     }
+
+    public readonly struct ReplayLevelMessage
+    {
+        
+    }
 }

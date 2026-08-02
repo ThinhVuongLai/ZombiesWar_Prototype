@@ -210,7 +210,6 @@ namespace App.Level
         public void ClearLevel()
         {
             var canvasManager = ServiceLocator.Resolve<CanvasManager>();
-            canvasManager.Hide(UIName.InGameMenu);
 
             foreach (var enemyView in _spawnedEnemies)
             {
@@ -253,6 +252,8 @@ namespace App.Level
         {
             ClearLevel();
             LoadLevel(_currentLevelId);
+
+            ServiceLocator.Resolve<IEventBus>().Publish(new ReplayLevelMessage());
         }
 
         Vector3 GetRandomSpawnPosition(float spawnRadius)
