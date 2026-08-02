@@ -82,7 +82,7 @@ namespace App.Enemy.Weapon.Editor
                     DrawField(ref verticalPosition, position, property, "_actionRadius", lineHeight, spacing);
                     DrawField(ref verticalPosition, position, property, "_objectLifespan", lineHeight, spacing);
                     DrawField(ref verticalPosition, position, property, "_gravityScale", lineHeight, spacing);
-                    DrawField(ref verticalPosition, position, property, "_objectPrefab", lineHeight, spacing);
+                    DrawField(ref verticalPosition, position, property, "_weaponPrefab", lineHeight, spacing);
                     break;
             }
 

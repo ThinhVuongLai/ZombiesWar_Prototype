@@ -66,6 +66,7 @@ namespace ZombiesWar.Weapon.Editor
             DrawField(ref verticalPosition, position, property, "_attackRange", lineHeight, spacing);
             DrawField(ref verticalPosition, position, property, "_attackIdleAnimation", lineHeight, spacing);
             DrawField(ref verticalPosition, position, property, "_attackAnimation", lineHeight, spacing);
+            DrawField(ref verticalPosition, position, property, "_weaponPrefab", lineHeight, spacing);
 
             switch (currentType)
             {
@@ -86,7 +87,6 @@ namespace ZombiesWar.Weapon.Editor
                     DrawField(ref verticalPosition, position, property, "_actionRadius", lineHeight, spacing);
                     DrawField(ref verticalPosition, position, property, "_objectLifespan", lineHeight, spacing);
                     DrawField(ref verticalPosition, position, property, "_gravityScale", lineHeight, spacing);
-                    DrawField(ref verticalPosition, position, property, "_objectPrefab", lineHeight, spacing);
                     break;
             }
 
@@ -113,6 +113,7 @@ namespace ZombiesWar.Weapon.Editor
             var oldRange = property.FindPropertyRelative("_attackRange").floatValue;
             var oldAttackIdleAnimation = property.FindPropertyRelative("_attackIdleAnimation").stringValue;
             var oldAttackAnimation = property.FindPropertyRelative("_attackAnimation").stringValue;
+            var oldWeaponPrefab = property.FindPropertyRelative("_weaponPrefab").objectReferenceValue;
 
             var oldAttackDuration = property.FindPropertyRelative("_attackDuration")?.floatValue ?? 0.5f;
             var oldTakeDamageTime = property.FindPropertyRelative("_takeDamageTime")?.floatValue ?? 0.5f;
@@ -135,6 +136,7 @@ namespace ZombiesWar.Weapon.Editor
             property.FindPropertyRelative("_attackRange").floatValue = oldRange;
             property.FindPropertyRelative("_attackIdleAnimation").stringValue = oldAttackIdleAnimation;
             property.FindPropertyRelative("_attackAnimation").stringValue = oldAttackAnimation;
+            property.FindPropertyRelative("_weaponPrefab").objectReferenceValue = oldWeaponPrefab;
 
             var attackDurationProp = property.FindPropertyRelative("_attackDuration");
             if (attackDurationProp != null) attackDurationProp.floatValue = oldAttackDuration;
@@ -163,11 +165,11 @@ namespace ZombiesWar.Weapon.Editor
             {
                 WeaponType.Melee => 3,
                 WeaponType.Range => 1,
-                WeaponType.Throwing => 9,
+                WeaponType.Throwing => 8,
                 _ => 0,
             };
 
-            int fieldLines = 7 + extraLines;
+            int fieldLines = 8 + extraLines;
             return (fieldLines + 1) * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
         }
     }

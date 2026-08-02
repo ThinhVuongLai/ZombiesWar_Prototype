@@ -12,6 +12,6 @@ namespace App.Combat.Attack
         float ObjectLifespan { get; }
         float ActionRadius { get; }
         ThrowActionType ActionType { get; }
-        GameObject ObjectPrefab { get; }
+        GameObject WeaponPrefab { get; }
     }
 }

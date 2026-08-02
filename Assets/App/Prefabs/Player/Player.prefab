@@ -73,6 +73,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 922850681635409580}
+  _rangeContain: {fileID: 2363440209535033436}
+  _meleeContain: {fileID: 2363440209535033436}
+  _thrownContain: {fileID: 2363440209535033436}
 --- !u!1 &6765245732309977149
 GameObject:
   m_ObjectHideFlags: 0

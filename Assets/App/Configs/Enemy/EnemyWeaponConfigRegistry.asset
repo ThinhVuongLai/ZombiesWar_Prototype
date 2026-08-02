@@ -26,5 +26,5 @@ MonoBehaviour:
         _attackRange: 1.2
         _attackCooldown: 0.5
         _attackDuration: 1
-        _takeDamageTime: 0.5
+        _takeDamageTime: 0.3
         _hitZoneSize: {x: 1, y: 1.5}

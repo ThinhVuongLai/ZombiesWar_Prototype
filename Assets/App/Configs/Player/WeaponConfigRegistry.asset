@@ -14,37 +14,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _configs:
   - rid: 886955830288842760
-  - rid: 886955830288842758
+  - rid: 1564660071560118273
   references:
     version: 2
     RefIds:
-    - rid: 886955830288842758
-      type: {class: ThrowWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
-      data:
-        _weaponId: 1
-        _weaponType: 2
-        _attackCooldown: 0.5
-        _damage: 10
-        _attackRange: 2
-        _attackIdleAnimation: 
-        _attackAnimation: 
-        _throwAngle: 45
-        _minThrowForce: 5
-        _maxThrowForce: 20
-        _throwSpeed: 10
-        _actionType: 1
-        _actionRadius: 3
-        _objectLifespan: 5
-        _gravityScale: 1
-        _objectPrefab: {fileID: 0}
     - rid: 886955830288842760
       type: {class: RangeWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
       data:
         _weaponId: 0
         _weaponType: 1
-        _attackCooldown: 1
+        _attackCooldown: 0.8
         _damage: 10
         _attackRange: 8
         _attackIdleAnimation: Solider_combat_idle
         _attackAnimation: Solider_combat_shoot
+        _weaponPrefab: {fileID: 8711761514253074464, guid: 72f51440c7cb69249aca74608717cad9,
+          type: 3}
+        _bulletId: 0
+    - rid: 1564660071560118273
+      type: {class: RangeWeaponConfig, ns: ZombiesWar.Weapon, asm: Assembly-CSharp}
+      data:
+        _weaponId: 1
+        _weaponType: 1
+        _attackCooldown: 0.1
+        _damage: 2
+        _attackRange: 8
+        _attackIdleAnimation: Solider_combat_idle
+        _attackAnimation: Solider_combat_shoot
+        _weaponPrefab: {fileID: 7732682478302818657, guid: b65a9300e33a2274f8936f2d613d247c,
+          type: 3}
         _bulletId: 0

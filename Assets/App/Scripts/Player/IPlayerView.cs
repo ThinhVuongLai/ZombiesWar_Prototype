@@ -1,6 +1,7 @@
 using System;
 using App.HealthBar;
 using UnityEngine;
+using ZombiesWar.Weapon;
 
 namespace App.Player
 {
@@ -14,5 +15,6 @@ namespace App.Player
         Transform Transform { get; }
         IHealthBarView CreateHealthBar();
         void PlayDamageFlash(Color flashColor, float duration);
+        void SetWeaponModel(WeaponBase weaponConfig);
     }
 }

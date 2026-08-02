@@ -13,6 +13,9 @@ namespace App.Player
     public class PlayerView : MonoBehaviour, IPlayerView, IPlayerTargetProvider
     {
         [SerializeField] Animator _animator;
+        [SerializeField] Transform _rangeContain;
+        [SerializeField] Transform _meleeContain;
+        [SerializeField] Transform _thrownContain;
 
         CharacterController _characterController;
         PlayerPresenter _presenter;
@@ -21,6 +24,7 @@ namespace App.Player
         Tween _damageFlashTween;
         Color _originalBaseColor;
         string _colorPropertyName = "_BaseColor";
+        GameObject _currentWeaponModel;
 
         public bool IsGrounded => _characterController.isGrounded;
         public Transform Transform => transform;
@@ -135,6 +139,30 @@ namespace App.Player
                 halfDuration));
 
             _damageFlashTween = sequence;
+        }
+
+        public void SetWeaponModel(WeaponBase weaponConfig)
+        {
+            if (_currentWeaponModel != null)
+            {
+                Destroy(_currentWeaponModel);
+                _currentWeaponModel = null;
+            }
+
+            if (weaponConfig?.WeaponPrefab == null) return;
+
+            var contain = weaponConfig.WeaponType switch
+            {
+                WeaponType.Melee => _meleeContain,
+                WeaponType.Range => _rangeContain,
+                WeaponType.Throwing => _thrownContain,
+                _ => null,
+            };
+            if (contain == null) return;
+
+            _currentWeaponModel = Instantiate(weaponConfig.WeaponPrefab, contain);
+            _currentWeaponModel.transform.localPosition = Vector3.zero;
+            _currentWeaponModel.transform.localEulerAngles = Vector3.zero;
         }
 
         void ApplyPropertyBlock()

@@ -52,7 +52,7 @@ namespace App.Enemy.Weapon
         [SerializeField] float _actionRadius = 3f;
         [SerializeField] float _objectLifespan = 5f;
         [SerializeField] float _gravityScale = 1f;
-        [SerializeField] GameObject _objectPrefab;
+        [SerializeField] GameObject _weaponPrefab;
 
         public float ThrowAngle => _throwAngle;
         public float MinimumThrowForce => _minThrowForce;
@@ -61,7 +61,7 @@ namespace App.Enemy.Weapon
         public float ActionRadius => _actionRadius;
         public float ObjectLifespan => _objectLifespan;
         public float GravityScale => _gravityScale;
-        public GameObject ObjectPrefab => _objectPrefab;
+        public GameObject WeaponPrefab => _weaponPrefab;
     }
 
     [CreateAssetMenu(fileName = "EnemyWeaponConfigRegistry", menuName = "ZombiesWar/Enemy Weapon Config Registry")]

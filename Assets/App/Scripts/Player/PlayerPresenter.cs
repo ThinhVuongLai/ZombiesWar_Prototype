@@ -280,6 +280,7 @@ namespace App.Player
                 _currentBulletConfig = null;
                 _currentWeaponConfig = null;
                 _currentWeaponType = WeaponType.Melee;
+                _view.SetWeaponModel(null);
                 return;
             }
 
@@ -308,6 +309,7 @@ namespace App.Player
             AttackStrategyRegistry.RegisterFromConfig(_attackRegistry, weaponConfig, _bulletConfigRegistry);
             
             PlayAttackIdleAnimation();
+            _view.SetWeaponModel(weaponConfig);
         }
 
         void UpdateWeaponECSRadius(float radius)

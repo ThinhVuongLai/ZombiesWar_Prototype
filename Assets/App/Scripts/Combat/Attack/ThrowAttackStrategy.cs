@@ -23,14 +23,14 @@ namespace App.Combat.Attack
             IHealthAccessor healthAccessor, bool faceTarget,
             Action<float> fallbackDamageDealer = null)
         {
-            if (_config == null || _config.ObjectPrefab == null) return;
+            if (_config == null || _config.WeaponPrefab == null) return;
 
             var throwPosition = attackerPosition + new Vector3(0, 1.5f, 0);
 
             var velocity = CalculateThrowVelocity(throwPosition, targetPosition, _config);
             if (!velocity.HasValue) return;
 
-            var thrownGameObject = UnityEngine.Object.Instantiate(_config.ObjectPrefab, throwPosition, Quaternion.identity);
+            var thrownGameObject = UnityEngine.Object.Instantiate(_config.WeaponPrefab, throwPosition, Quaternion.identity);
             var thrownObject = thrownGameObject.GetComponent<ThrownObject>();
             if (thrownObject == null)
                 thrownObject = thrownGameObject.AddComponent<ThrownObject>();

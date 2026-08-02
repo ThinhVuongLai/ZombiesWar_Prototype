@@ -16,6 +16,7 @@ namespace ZombiesWar.Weapon
         [SerializeField] protected float _attackRange = 2f;
         [SerializeField] protected string _attackIdleAnimation;
         [SerializeField] protected string _attackAnimation;
+        [SerializeField] protected GameObject _weaponPrefab;
 
         public int WeaponId => _weaponId;
         public WeaponType WeaponType => _weaponType;
@@ -24,6 +25,7 @@ namespace ZombiesWar.Weapon
         public float AttackRange => _attackRange;
         public string AttackIdleAnimation => _attackIdleAnimation;
         public string AttackAnimation => _attackAnimation;
+        public GameObject WeaponPrefab => _weaponPrefab;
     }
 
     [Serializable]
@@ -57,7 +59,6 @@ namespace ZombiesWar.Weapon
         [SerializeField] float _actionRadius = 3f;
         [SerializeField] float _objectLifespan = 5f;
         [SerializeField] float _gravityScale = 1f;
-        [SerializeField] GameObject _objectPrefab;
 
         public float ThrowAngle => _throwAngle;
         public float MinimumThrowForce => _minThrowForce;
@@ -67,7 +68,6 @@ namespace ZombiesWar.Weapon
         public float ActionRadius => _actionRadius;
         public float ObjectLifespan => _objectLifespan;
         public float GravityScale => _gravityScale;
-        public GameObject ObjectPrefab => _objectPrefab;
     }
 
     [CreateAssetMenu(fileName = "WeaponConfigRegistry", menuName = "ZombiesWar/Weapon Config Registry")]

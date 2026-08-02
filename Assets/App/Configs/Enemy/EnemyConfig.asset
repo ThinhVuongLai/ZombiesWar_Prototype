@@ -17,7 +17,7 @@ MonoBehaviour:
     EnemyPrefab: {fileID: 3435127961950633917, guid: d46db4c61d814eb49aa0af043dedbab1,
       type: 3}
     WeaponId: 0
-    Health: 100
+    Health: 30
     IdleAnimationName: Zombie_1_Idle
     MoveAnimationName: Zombie_1_Walk
     AttackAnimationName: Zombie_1_Attack
