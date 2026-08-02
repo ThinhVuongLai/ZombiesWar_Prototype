@@ -1,3 +1,5 @@
+using App.Audio;
+using App.Booster;
 using App.Core.Services;
 using App.Enemy;
 using App.Enemy.Weapon;
@@ -22,6 +24,10 @@ namespace App.Core
         [SerializeField] WaveSpawnerConfig _waveSpawnerConfig;
         [SerializeField] EnemyConfig _enemyConfig;
         [SerializeField] LevelConfig _levelConfig;
+        [SerializeField] GlobalData _globalData;
+        [SerializeField] BoosterConfig _boosterConfig;
+        [SerializeField] MusicConfig _musicConfig;
+        [SerializeField] SfxConfig _sfxConfig;
 
         public PlayerConfig PlayerConfig => _playerConfig;
         public WeaponConfigRegistry WeaponConfigRegistry => _weaponConfigRegistry;
@@ -32,6 +38,10 @@ namespace App.Core
         public WaveSpawnerConfig WaveSpawnerConfig => _waveSpawnerConfig;
         public EnemyConfig EnemyConfig => _enemyConfig;
         public LevelConfig LevelConfig => _levelConfig;
+        public GlobalData GlobalData => _globalData;
+        public BoosterConfig BoosterConfig => _boosterConfig;
+        public MusicConfig MusicConfig => _musicConfig;
+        public SfxConfig SfxConfig => _sfxConfig;
 
         void Awake()
         {

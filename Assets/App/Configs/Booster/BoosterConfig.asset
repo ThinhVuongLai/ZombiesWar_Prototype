@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e7fe383cad8cd54f889dd13fcd90e15, type: 3}
+  m_Name: BoosterConfig
+  m_EditorClassIdentifier: 
+  _rocketPrefab: {fileID: 4334375388247100776, guid: c6ca3ee90df224948877781f1c5bd14e,
+    type: 3}
+  _explosionRadius: 5
+  _damage: 60
+  _spawnHeight: 15
+  _fallSpeed: 30
+  _cooldown: 10
+  _explosionEffectPrefab: {fileID: 0}
+  _effectDuration: 2
