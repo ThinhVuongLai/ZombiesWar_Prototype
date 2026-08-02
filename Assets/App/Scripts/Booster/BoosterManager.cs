@@ -17,7 +17,6 @@ namespace App.Booster
         EntityManager _entityManager;
         Entity _weaponTargetEntity;
         bool _weaponEntityResolved;
-        float _lastUseTime;
         CompositeDisposable _disposables;
 
         void Awake()
@@ -51,8 +50,7 @@ namespace App.Booster
         public void UseRocket()
         {
             if (_config == null) return;
-            if (Time.time - _lastUseTime < _config.Cooldown) return;
-            _lastUseTime = Time.time;
+            
             SpawnRocket(GetTargetPosition());
         }
 

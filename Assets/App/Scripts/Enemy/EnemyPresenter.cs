@@ -229,8 +229,6 @@ namespace App.Enemy
             if (globalData != null)
                 _view.PlayDamageFlash(globalData.DamageFlashColor, globalData.DamageFlashDuration);
 
-            UnityEngine.Debug.Log($"Enemy Get Damage, {health}");
-
             if (health.Value <= 0f)
             {
                 _isDead = true;

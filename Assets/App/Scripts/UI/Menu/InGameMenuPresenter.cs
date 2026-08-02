@@ -1,9 +1,12 @@
 using App.Booster;
+using App.Core;
 using App.Core.EventBus;
 using App.Core.Services;
 using App.Enemy.Wave;
 using App.Level;
 using R3;
+using Unity.VisualScripting;
+using UnityEngine;
 
 namespace App.UI
 {
@@ -18,9 +21,15 @@ namespace App.UI
         private BoosterManager _boosterManager;
         private int _levelEnemyTotal = 0;
 
+        private float _rocketCooldown = 0;
+        private float _lastUseTime;
+        private bool _inUseRocket = false;
+
         public InGameMenuPresenter(InGameMenuView view)
         {
             _view = view;
+
+            _rocketCooldown = ServiceLocator.Resolve<ConfigManager>().BoosterConfig.Cooldown;
         }
 
         public void Init(params object[] parameters)
@@ -40,6 +49,10 @@ namespace App.UI
             _view.ClickUseRocketBoosterAction = OnClickUseRocketBooster;
             _view.ClickChangeWeaponAction = OnClickChangeWeapon;
 
+            _view.SetShowRocketFill(false);
+            _inUseRocket = false;
+            _lastUseTime = 0;
+
             _eventBus.On<EnemyDefeatedMessage>()
                 .Subscribe(_ =>
                 {
@@ -52,9 +65,34 @@ namespace App.UI
             .Subscribe(_ =>
             {
                 _totalRemaining = _levelEnemyTotal;
+
+                _view.SetShowRocketFill(false);
+                _inUseRocket = false;
+                _lastUseTime = 0;
+
                 UpdateRemainingText();
             })
             .AddTo(_disposables);
+
+            Observable.EveryUpdate()
+                .Subscribe(_ => OnUpdate())
+                .AddTo(_disposables);
+        }
+
+        private void OnUpdate()
+        {
+            if (!_inUseRocket)
+                return;
+
+            _lastUseTime += Time.deltaTime;
+            float percent = _lastUseTime / _rocketCooldown;
+            _view.SetFillRocket(percent);
+
+            if (percent >= 1)
+            {
+                _inUseRocket = false;
+                _lastUseTime = 0;
+            }
         }
 
         public void Hide()
@@ -78,6 +116,9 @@ namespace App.UI
         private void OnClickUseRocketBooster()
         {
             _boosterManager.UseRocket();
+
+            _view.SetShowRocketFill(true);
+            _inUseRocket = true;
         }
 
         private void OnClickChangeWeapon()

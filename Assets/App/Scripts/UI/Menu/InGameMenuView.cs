@@ -12,6 +12,9 @@ namespace App.UI
         [SerializeField] private Button _useRocketBoosterButton;
         [SerializeField] private Button _changeWeaponButton;
 
+        [Header("For Rocket")]
+        [SerializeField] private Image _fillRocketImage;
+
         public Action ClickBackToMainAction;
         public Action ClickUseRocketBoosterAction;
         public Action ClickChangeWeaponAction;
@@ -28,5 +31,24 @@ namespace App.UI
 
         public void SetRemainingEnemyText(string text)
             => _remainingEnemyText.text = text;
+
+        public void SetFillRocket(float percent)
+        {
+            percent = Mathf.Clamp01(1 - percent);
+
+            _fillRocketImage.fillAmount = percent;
+
+            if (percent <= 0)
+            {
+                SetShowRocketFill(false);
+            }
+        }
+
+        public void SetShowRocketFill(bool show)
+        {
+            _fillRocketImage.gameObject.SetActive(show);
+
+            _useRocketBoosterButton.interactable = !show;
+        }
     }
 }
